@@ -1,0 +1,23 @@
+# Android / Gradle
+*.iml
+.gradle/
+build/
+local.properties
+captures/
+
+# IDE
+.idea/
+*.swp
+*~
+
+# Signing
+*.jks
+*.keystore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/settings.local.json
+/Projektplan.md

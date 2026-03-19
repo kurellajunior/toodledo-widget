@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1A3A7A"/>
+
+  <!-- Row 1: green -->
+  <rect x="64" y="72" width="64" height="64" rx="10" fill="#4CAF50"/>
+  <rect x="152" y="86" width="296" height="36" rx="18" fill="#C8D6E8"/>
+
+  <!-- Row 2: orange -->
+  <rect x="64" y="168" width="64" height="64" rx="10" fill="#E8A028"/>
+  <rect x="152" y="182" width="240" height="36" rx="18" fill="#C8D6E8"/>
+
+  <!-- Row 3: red -->
+  <rect x="64" y="264" width="64" height="64" rx="10" fill="#E05545"/>
+  <rect x="152" y="278" width="268" height="36" rx="18" fill="#C8D6E8"/>
+
+  <!-- Row 4: completed -->
+  <circle cx="96" cy="392" r="32" fill="#FFFFFF"/>
+  <polyline points="76,392 90,412 118,372"
+            fill="none" stroke="#D4941A" stroke-width="11"
+            stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="152" y="374" width="200" height="36" rx="18" fill="#6E84A3"/>
+</svg>
