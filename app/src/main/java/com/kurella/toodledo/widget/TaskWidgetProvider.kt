@@ -13,6 +13,22 @@ import android.view.View
 import android.widget.RemoteViews
 
 private const val TAG = "ToodledoWidget"
+private const val TOODLEDO_PACKAGE = "com.toodledo"
+
+// SharedPreferences keys and defaults
+const val PREFS_NAME = "widget_settings"
+const val PREF_TRANSPARENCY = "transparency"
+const val PREF_FONT_SIZE = "font_size"
+private const val DEFAULT_TRANSPARENCY = 25
+const val DEFAULT_FONT_SIZE = 100
+
+// Theme colors (internal — used by TaskWidgetService)
+internal const val LIGHT_BASE = 0xFFFFFF
+internal const val DARK_BASE = 0x303030
+internal const val LIGHT_SECTION_BASE = 0x424242
+internal const val DARK_SECTION_BASE = 0x505050
+internal const val LIGHT_TEXT = 0xFF000000.toInt()
+internal const val DARK_TEXT = 0xFFE0E0E0.toInt()
 
 class TaskWidgetProvider : AppWidgetProvider() {
 
@@ -21,45 +37,68 @@ class TaskWidgetProvider : AppWidgetProvider() {
 
         fun refresh(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
-            val ids = manager.getAppWidgetIds(
+            val widgetIds = manager.getAppWidgetIds(
                 ComponentName(context, TaskWidgetProvider::class.java)
             )
-            manager.notifyAppWidgetViewDataChanged(ids, R.id.task_list)
+            manager.notifyAppWidgetViewDataChanged(widgetIds, R.id.task_list)
         }
 
-        /** Full update including layout changes (transparency, status line) */
+        /** Full update including layout changes (transparency, status line). */
         fun fullUpdate(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
-            val ids = manager.getAppWidgetIds(
+            val widgetIds = manager.getAppWidgetIds(
                 ComponentName(context, TaskWidgetProvider::class.java)
             )
-            if (ids.isNotEmpty()) {
-                TaskWidgetProvider().onUpdate(context, manager, ids)
+            if (widgetIds.isNotEmpty()) {
+                TaskWidgetProvider().onUpdate(context, manager, widgetIds)
             }
         }
 
-        /** Layout-only update (background, text colors) without rebinding adapter */
+        /** Layout-only update (background color) without rebinding adapter. */
         fun updateLayout(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
-            val ids = manager.getAppWidgetIds(
+            val widgetIds = manager.getAppWidgetIds(
                 ComponentName(context, TaskWidgetProvider::class.java)
             )
-            if (ids.isEmpty()) return
+            if (widgetIds.isEmpty()) return
 
-            val prefs = context.getSharedPreferences("widget_settings", Context.MODE_PRIVATE)
-            val transparency = prefs.getInt("transparency", 25)
-            val alpha = ((100 - transparency) * 255 / 100)
-            val isDark = (context.resources.configuration.uiMode
-                and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-            val baseColor = if (isDark) 0x303030 else 0xFFFFFF
-            val bgColor = (alpha shl 24) or baseColor
-
-            for (widgetId in ids) {
+            val bgColor = resolveBackgroundColor(context)
+            for (widgetId in widgetIds) {
                 val views = RemoteViews(context.packageName, R.layout.widget_task_list)
                 views.setInt(R.id.widget_background, "setBackgroundColor", bgColor)
                 manager.partiallyUpdateAppWidget(widgetId, views)
             }
         }
+
+        /** Resolves the widget background color from theme + transparency setting. */
+        fun resolveBackgroundColor(context: Context): Int {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val transparency = prefs.getInt(PREF_TRANSPARENCY, DEFAULT_TRANSPARENCY)
+            return buildColor(context, transparency)
+        }
+
+        /** Builds an ARGB color from theme base color and transparency percentage. */
+        fun buildColor(context: Context, transparencyPercent: Int): Int {
+            val alpha = (100 - transparencyPercent) * 255 / 100
+            val baseColor = if (isDarkMode(context)) DARK_BASE else LIGHT_BASE
+            return (alpha shl 24) or baseColor
+        }
+
+        /** Section header color: contrasting background with half the user's transparency. */
+        fun sectionColor(context: Context): Int {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val transparency = prefs.getInt(PREF_TRANSPARENCY, DEFAULT_TRANSPARENCY)
+            val alpha = (100 - transparency / 2) * 255 / 100
+            val baseColor = if (isDarkMode(context)) DARK_SECTION_BASE else LIGHT_SECTION_BASE
+            return (alpha shl 24) or baseColor
+        }
+
+        fun isDarkMode(context: Context): Boolean =
+            (context.resources.configuration.uiMode
+                and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+        fun textColor(context: Context): Int =
+            if (isDarkMode(context)) DARK_TEXT else LIGHT_TEXT
     }
 
     override fun onUpdate(
@@ -67,16 +106,8 @@ class TaskWidgetProvider : AppWidgetProvider() {
     ) {
         Log.d(TAG, "onUpdate: ${widgetIds.size} widgets")
         val tokenStore = TokenStore(context)
-        val prefs = context.getSharedPreferences("widget_settings", Context.MODE_PRIVATE)
-        val transparency = prefs.getInt("transparency", 25)
-        // transparency 0% = fully opaque (alpha 255), 100% = fully transparent (alpha 0)
-        val alpha = ((100 - transparency) * 255 / 100)
-        val isDarkMode = (context.resources.configuration.uiMode
-            and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-        val baseColor = if (isDarkMode) 0x303030 else 0xFFFFFF
-        val bgColor = (alpha shl 24) or baseColor
-
-        val textColor = if (isDarkMode) 0xFFE0E0E0.toInt() else 0xFF000000.toInt()
+        val bgColor = resolveBackgroundColor(context)
+        val textColor = textColor(context)
 
         for (widgetId in widgetIds) {
             val views = RemoteViews(context.packageName, R.layout.widget_task_list)
@@ -131,10 +162,7 @@ class TaskWidgetProvider : AppWidgetProvider() {
             manager.updateAppWidget(widgetId, views)
         }
 
-        // Trigger data refresh after adapter is bound
         manager.notifyAppWidgetViewDataChanged(widgetIds, R.id.task_list)
-
-        // Ensure periodic refresh is scheduled
         RefreshWorker.schedule(context)
     }
 
@@ -145,36 +173,28 @@ class TaskWidgetProvider : AppWidgetProvider() {
             "complete" -> {
                 val taskId = intent.getLongExtra("task_id", -1)
                 if (taskId != -1L) {
+                    val appContext = context.applicationContext
                     Thread {
-                        try {
-                            val api = ToodledoApi(TokenStore(context))
-                            api.completeTask(taskId)
+                        val success = try {
+                            ToodledoApi(TokenStore(appContext)).completeTask(taskId)
                         } catch (e: Exception) {
                             Log.e(TAG, "completeTask failed", e)
+                            false
                         }
-                        refresh(context)
+                        if (success) {
+                            refresh(appContext)
+                        } else {
+                            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                android.widget.Toast.makeText(appContext,
+                                    R.string.error_offline, android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }.start()
                 }
             }
-            "open" -> {
-                val taskId = intent.getLongExtra("task_id", -1)
-                if (taskId != -1L) {
-                    val openIntent = context.packageManager
-                        .getLaunchIntentForPackage("com.toodledo")
-                    if (openIntent != null) {
-                        openIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(openIntent)
-                    } else {
-                        val url = "https://www.toodledo.com/tasks/index.php"
-                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        })
-                    }
-                }
-            }
+            "open" -> openToodledo(context)
             "refresh" -> {
                 Log.d(TAG, "Refresh from list item")
-                // Full update scrolls to top; refresh only reloads data
                 fullUpdate(context)
             }
         }
@@ -182,6 +202,19 @@ class TaskWidgetProvider : AppWidgetProvider() {
         if (intent.action == ACTION_REFRESH) {
             Log.d(TAG, "ACTION_REFRESH received")
             refresh(context)
+        }
+    }
+
+    private fun openToodledo(context: Context) {
+        val appIntent = context.packageManager.getLaunchIntentForPackage(TOODLEDO_PACKAGE)
+        if (appIntent != null) {
+            appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(appIntent)
+        } else {
+            context.startActivity(Intent(Intent.ACTION_VIEW,
+                Uri.parse(ToodledoApi.WEB_TASKS_URL)).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            })
         }
     }
 }

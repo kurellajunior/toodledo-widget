@@ -1,4 +1,5 @@
 <resources>
+    <string name="widget_name">Taken</string>
     <string name="settings_title">Widget-instellingen</string>
     <string name="not_logged_in">Tik om in te loggen bij Toodledo</string>
     <string name="loading">Taken laden…</string>

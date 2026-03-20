@@ -13,8 +13,11 @@ sealed class ListItem {
 
 object TaskSorter {
 
-    fun buildList(tasks: List<Task>, context: Context): List<ListItem> {
-        val today = LocalDate.now()
+    fun buildList(
+        tasks: List<Task>,
+        context: Context,
+        today: LocalDate = LocalDate.now()
+    ): List<ListItem> {
         val sorted = tasks.sortedWith(
             compareBy<Task> { it.category(today).ordinal }
                 .thenBy { it.sortDate(today) }
@@ -29,9 +32,7 @@ object TaskSorter {
             val section = sectionLabel(task, today, context)
             if (section != currentSection) {
                 currentSection = section
-                // Only show headers for future sections, not Overdue/Today
-                val cat = task.category(today)
-                if (cat == Category.FUTURE) {
+                if (task.category(today) == Category.FUTURE) {
                     items += ListItem.SectionHeader(section)
                 }
             }
@@ -41,25 +42,27 @@ object TaskSorter {
     }
 
     private fun sectionLabel(task: Task, today: LocalDate, context: Context): String {
-        val cat = task.category(today)
-        if (cat == Category.OVERDUE) return context.getString(R.string.section_overdue)
-        if (cat == Category.CURRENT) return context.getString(R.string.section_today)
+        val category = task.category(today)
+        if (category == Category.OVERDUE) return context.getString(R.string.section_overdue)
+        if (category == Category.CURRENT) return context.getString(R.string.section_today)
 
         val start = task.startDate ?: task.dueDate
-        val tomorrow = today.plusDays(1)
-        if (start == tomorrow) return context.getString(R.string.section_tomorrow)
+        if (start == today.plusDays(1)) return context.getString(R.string.section_tomorrow)
 
         val weekFields = WeekFields.of(Locale.getDefault())
-        val thisWeek = today.get(weekFields.weekOfYear())
-        val startWeek = start.get(weekFields.weekOfYear())
-        val thisYear = today.year
-        val startYear = start.year
+        val todayWeek = today.get(weekFields.weekOfWeekBasedYear())
+        val todayYear = today.get(weekFields.weekBasedYear())
+        val startWeek = start.get(weekFields.weekOfWeekBasedYear())
+        val startYear = start.get(weekFields.weekBasedYear())
 
-        if (startYear == thisYear && startWeek == thisWeek) {
+        if (startYear == todayYear && startWeek == todayWeek) {
             return context.getString(R.string.section_this_week)
         }
-        if (startYear == thisYear && startWeek == thisWeek + 1 ||
-            startYear == thisYear + 1 && thisWeek >= 52 && startWeek == 1) {
+        // Next week: either same year week+1, or year boundary (week 52/53 → week 1)
+        val nextWeek = today.plusWeeks(1)
+        val nextWeekNum = nextWeek.get(weekFields.weekOfWeekBasedYear())
+        val nextWeekYear = nextWeek.get(weekFields.weekBasedYear())
+        if (startYear == nextWeekYear && startWeek == nextWeekNum) {
             return context.getString(R.string.section_next_week)
         }
         return context.getString(R.string.section_later)

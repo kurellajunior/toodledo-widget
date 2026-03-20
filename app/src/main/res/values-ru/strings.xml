@@ -1,4 +1,5 @@
 <resources>
+    <string name="widget_name">Задачи</string>
     <string name="settings_title">Настройки виджета</string>
     <string name="not_logged_in">Нажмите, чтобы войти в Toodledo</string>
     <string name="loading">Загрузка задач…</string>

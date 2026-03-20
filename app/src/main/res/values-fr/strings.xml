@@ -1,4 +1,5 @@
 <resources>
+    <string name="widget_name">Tâches</string>
     <string name="settings_title">Paramètres du widget</string>
     <string name="not_logged_in">Appuyez pour vous connecter à Toodledo</string>
     <string name="loading">Chargement des tâches…</string>

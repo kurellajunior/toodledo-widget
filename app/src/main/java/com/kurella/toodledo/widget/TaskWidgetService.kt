@@ -2,14 +2,25 @@ package com.kurella.toodledo.widget
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Build
 import android.util.Log
 import android.util.TypedValue
+import android.view.Gravity
+import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import java.time.LocalDate
 
 private const val TAG = "ToodledoWidget"
+
+private const val OVERDUE_BACKGROUND = 0x40F44336  // translucent red
+private const val TRANSPARENT = 0x00000000
+
+private const val BASE_TEXT_SP = 14f
+private const val BASE_SECTION_SP = 11f
+private const val BASE_BOX_DP = 16f
+private const val BASE_ICON_DP = 14f
+private const val SECTION_TEXT_COLOR = 0xFFFFFFFF.toInt()  // white on dark section bar
 
 class TaskWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory =
@@ -20,7 +31,9 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
 
     private var items: List<ListItem> = emptyList()
     private var fontScale: Float = 1.0f
-    private var isDarkMode: Boolean = false
+    private var textColor: Int = LIGHT_TEXT
+    private var sectionBackground: Int = (0xFF shl 24) or LIGHT_SECTION_BASE
+    private var sectionTextColor: Int = SECTION_TEXT_COLOR
 
     override fun onCreate() {
         Log.d(TAG, "Factory.onCreate")
@@ -35,10 +48,13 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
 
     private fun loadTasks() {
         try {
-            val prefs = context.getSharedPreferences("widget_settings", Context.MODE_PRIVATE)
-            fontScale = prefs.getInt("font_size", 100) / 100f
-            isDarkMode = (context.resources.configuration.uiMode
-                and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            fontScale = prefs.getInt(PREF_FONT_SIZE, DEFAULT_FONT_SIZE) / 100f
+
+            textColor = TaskWidgetProvider.textColor(context)
+            sectionTextColor = SECTION_TEXT_COLOR
+
+            sectionBackground = TaskWidgetProvider.sectionColor(context)
 
             val tokenStore = TokenStore(context)
             if (!tokenStore.isLoggedIn) {
@@ -50,7 +66,6 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
             val tasks = api.fetchTasks()
             if (tasks == null) {
                 Log.w(TAG, "loadTasks: fetchTasks returned null (token or network error)")
-                // Keep existing items on failure so widget doesn't go blank
                 return
             }
             items = TaskSorter.buildList(tasks, context) + ListItem.RefreshItem
@@ -74,82 +89,70 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
     private fun buildSectionView(header: ListItem.SectionHeader): RemoteViews {
         return RemoteViews(context.packageName, R.layout.widget_section_header).apply {
             setTextViewText(R.id.section_title, header.title)
-            setTextViewTextSize(R.id.section_title, TypedValue.COMPLEX_UNIT_SP, 11f * fontScale)
+            setTextViewTextSize(R.id.section_title, TypedValue.COMPLEX_UNIT_SP, BASE_SECTION_SP * fontScale)
+            setInt(R.id.section_title, "setBackgroundColor", sectionBackground)
+            setTextColor(R.id.section_title, sectionTextColor)
         }
     }
 
     private fun buildTaskView(task: Task): RemoteViews {
-        val today = java.time.LocalDate.now()
+        val today = LocalDate.now()
         val overdue = task.category(today) == Category.OVERDUE
-        val overdueColor = 0x40F44336 // translucent red
-
-        val textColor = if (isDarkMode) 0xFFE0E0E0.toInt() else 0xFF000000.toInt()
-
-        val boxSizeDp = 16f * fontScale
 
         return RemoteViews(context.packageName, R.layout.widget_task_row).apply {
             setTextViewText(R.id.task_title, task.title)
-            setTextViewTextSize(R.id.task_title, TypedValue.COMPLEX_UNIT_SP, 14f * fontScale)
+            setTextViewTextSize(R.id.task_title, TypedValue.COMPLEX_UNIT_SP, BASE_TEXT_SP * fontScale)
             setTextColor(R.id.task_title, textColor)
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                setViewLayoutWidth(R.id.priority_frame, boxSizeDp, TypedValue.COMPLEX_UNIT_DIP)
-                setViewLayoutHeight(R.id.priority_frame, boxSizeDp, TypedValue.COMPLEX_UNIT_DIP)
-                val iconDp = 14f * fontScale
+                val boxDp = BASE_BOX_DP * fontScale
+                setViewLayoutWidth(R.id.priority_frame, boxDp, TypedValue.COMPLEX_UNIT_DIP)
+                setViewLayoutHeight(R.id.priority_frame, boxDp, TypedValue.COMPLEX_UNIT_DIP)
+                val iconDp = BASE_ICON_DP * fontScale
                 setViewLayoutWidth(R.id.note_icon, iconDp, TypedValue.COMPLEX_UNIT_DIP)
                 setViewLayoutHeight(R.id.note_icon, iconDp, TypedValue.COMPLEX_UNIT_DIP)
                 setViewLayoutWidth(R.id.repeat_icon, iconDp, TypedValue.COMPLEX_UNIT_DIP)
                 setViewLayoutHeight(R.id.repeat_icon, iconDp, TypedValue.COMPLEX_UNIT_DIP)
             }
+
             setInt(R.id.priority_box, "setBackgroundColor", task.priority.color)
+            setInt(R.id.task_row, "setBackgroundColor",
+                if (overdue) OVERDUE_BACKGROUND else TRANSPARENT)
 
-            if (overdue) {
-                setInt(R.id.task_row, "setBackgroundColor", overdueColor)
-            } else {
-                setInt(R.id.task_row, "setBackgroundColor", 0x00000000)
-            }
+            setViewVisibility(R.id.note_icon, if (task.hasNote) View.VISIBLE else View.GONE)
+            if (task.hasNote) setInt(R.id.note_icon, "setColorFilter", textColor)
 
-            if (task.hasNote) {
-                setViewVisibility(R.id.note_icon, android.view.View.VISIBLE)
-                setInt(R.id.note_icon, "setColorFilter", textColor)
-            } else {
-                setViewVisibility(R.id.note_icon, android.view.View.GONE)
-            }
+            setViewVisibility(R.id.repeat_icon, if (task.isRepeating) View.VISIBLE else View.GONE)
+            if (task.isRepeating) setInt(R.id.repeat_icon, "setColorFilter", textColor)
 
-            if (task.isRepeating) {
-                setViewVisibility(R.id.repeat_icon, android.view.View.VISIBLE)
-                setInt(R.id.repeat_icon, "setColorFilter", textColor)
-            } else {
-                setViewVisibility(R.id.repeat_icon, android.view.View.GONE)
-            }
-
-            // Fill intent: tap on checkbox → complete task
-            val completeIntent = Intent().apply {
+            setOnClickFillInIntent(R.id.priority_frame, Intent().apply {
                 putExtra("task_id", task.id)
                 putExtra("action", "complete")
-            }
-            setOnClickFillInIntent(R.id.priority_frame, completeIntent)
-
-            // Fill intent: tap on title → open in Toodledo
-            val openIntent = Intent().apply {
+            })
+            setOnClickFillInIntent(R.id.task_title, Intent().apply {
                 putExtra("task_id", task.id)
                 putExtra("action", "open")
-            }
-            setOnClickFillInIntent(R.id.task_title, openIntent)
+            })
         }
     }
 
     private fun buildRefreshView(): RemoteViews {
         return RemoteViews(context.packageName, R.layout.widget_section_header).apply {
             setTextViewText(R.id.section_title, context.getString(R.string.refresh))
-            setTextViewTextSize(R.id.section_title, TypedValue.COMPLEX_UNIT_SP, 11f * fontScale)
-            setInt(R.id.section_title, "setGravity", android.view.Gravity.CENTER)
-            val fillIntent = Intent().apply { putExtra("action", "refresh") }
-            setOnClickFillInIntent(R.id.section_title, fillIntent)
+            setTextViewTextSize(R.id.section_title, TypedValue.COMPLEX_UNIT_SP, BASE_SECTION_SP * fontScale)
+            setInt(R.id.section_title, "setGravity", Gravity.CENTER)
+            setInt(R.id.section_title, "setBackgroundColor", sectionBackground)
+            setTextColor(R.id.section_title, sectionTextColor)
+            setOnClickFillInIntent(R.id.section_title, Intent().apply {
+                putExtra("action", "refresh")
+            })
         }
     }
 
     override fun getLoadingView(): RemoteViews? = null
-    override fun getViewTypeCount(): Int = 2 // task row + section header (refresh reuses section header layout)
+
+    /** Two layout types: widget_task_row and widget_section_header (reused for refresh). */
+    override fun getViewTypeCount(): Int = 2
     override fun getItemId(position: Int): Long = position.toLong()
     override fun hasStableIds(): Boolean = false
     override fun onDestroy() {}

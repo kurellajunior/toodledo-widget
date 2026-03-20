@@ -19,14 +19,11 @@ class AddTaskActivity : AppCompatActivity() {
             appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(appIntent)
         } else {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TOODLEDO_ADD_URL)).apply {
+            startActivity(Intent(Intent.ACTION_VIEW,
+                Uri.parse(ToodledoApi.WEB_TASKS_URL)).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
         }
         finish()
-    }
-
-    companion object {
-        private const val TOODLEDO_ADD_URL = "https://www.toodledo.com/tasks/index.php"
     }
 }

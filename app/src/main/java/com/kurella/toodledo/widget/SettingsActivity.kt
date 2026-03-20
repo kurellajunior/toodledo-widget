@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 class SettingsActivity : AppCompatActivity() {
 
     private val prefs by lazy {
-        getSharedPreferences("widget_settings", MODE_PRIVATE)
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +25,7 @@ class SettingsActivity : AppCompatActivity() {
         val loginButton = findViewById<Button>(R.id.login_button)
 
         // Transparency: 0-100% in 5% steps, default 25%
-        transparencyBar.progress = prefs.getInt("transparency", 25) / 5
+        transparencyBar.progress = prefs.getInt(PREF_TRANSPARENCY, 25) / 5
         transparencyLabel.text = "${transparencyBar.progress * 5}%"
         transparencyBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(bar: SeekBar, value: Int, fromUser: Boolean) {
@@ -33,13 +33,13 @@ class SettingsActivity : AppCompatActivity() {
             }
             override fun onStartTrackingTouch(bar: SeekBar) {}
             override fun onStopTrackingTouch(bar: SeekBar) {
-                prefs.edit().putInt("transparency", bar.progress * 5).apply()
+                prefs.edit().putInt(PREF_TRANSPARENCY, bar.progress * 5).apply()
                 TaskWidgetProvider.updateLayout(this@SettingsActivity)
             }
         })
 
         // Font size: 50-200% in 5% steps, default 100%
-        fontSizeBar.progress = (prefs.getInt("font_size", 100) - 50) / 5
+        fontSizeBar.progress = (prefs.getInt(PREF_FONT_SIZE, 100) - 50) / 5
         fontSizeLabel.text = "${fontSizeBar.progress * 5 + 50}%"
         fontSizeBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(bar: SeekBar, value: Int, fromUser: Boolean) {
@@ -47,7 +47,7 @@ class SettingsActivity : AppCompatActivity() {
             }
             override fun onStartTrackingTouch(bar: SeekBar) {}
             override fun onStopTrackingTouch(bar: SeekBar) {
-                prefs.edit().putInt("font_size", bar.progress * 5 + 50).apply()
+                prefs.edit().putInt(PREF_FONT_SIZE, bar.progress * 5 + 50).apply()
                 TaskWidgetProvider.fullUpdate(this@SettingsActivity)
             }
         })

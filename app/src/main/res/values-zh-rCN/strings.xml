@@ -1,4 +1,5 @@
 <resources>
+    <string name="widget_name">任务</string>
     <string name="settings_title">小部件设置</string>
     <string name="not_logged_in">点击登录 Toodledo</string>
     <string name="loading">正在加载任务…</string>

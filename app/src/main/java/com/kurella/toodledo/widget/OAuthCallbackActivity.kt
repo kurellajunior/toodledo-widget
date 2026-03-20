@@ -3,6 +3,7 @@ package com.kurella.toodledo.widget
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class OAuthCallbackActivity : AppCompatActivity() {
@@ -24,19 +25,27 @@ class OAuthCallbackActivity : AppCompatActivity() {
 
     private fun startLogin() {
         val api = ToodledoApi(TokenStore(this))
-        val authUrl = api.buildAuthUrl()
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(authUrl)))
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(api.buildAuthUrl())))
         finish()
     }
 
     private fun handleCallback(uri: Uri) {
         val code = uri.getQueryParameter("code")
         if (code != null) {
+            val appContext = applicationContext
             Thread {
-                val api = ToodledoApi(TokenStore(this))
-                val success = api.exchangeCode(code)
+                val success = try {
+                    ToodledoApi(TokenStore(appContext)).exchangeCode(code)
+                } catch (e: Exception) {
+                    android.util.Log.e("ToodledoWidget", "OAuth exchange failed", e)
+                    false
+                }
                 if (success) {
-                    TaskWidgetProvider.fullUpdate(this)
+                    TaskWidgetProvider.fullUpdate(appContext)
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(appContext, R.string.error_auth, Toast.LENGTH_LONG).show()
+                    }
                 }
                 runOnUiThread { goHome() }
             }.start()
@@ -45,8 +54,8 @@ class OAuthCallbackActivity : AppCompatActivity() {
         }
     }
 
+    /** Navigate to home screen so user sees the widget, not Chrome's back stack. */
     private fun goHome() {
-        // Navigate to home screen so user sees the widget, not Chrome's back stack
         startActivity(Intent(Intent.ACTION_MAIN).apply {
             addCategory(Intent.CATEGORY_HOME)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
