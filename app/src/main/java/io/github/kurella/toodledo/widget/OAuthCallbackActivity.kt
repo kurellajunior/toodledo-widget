@@ -1,10 +1,12 @@
-package com.kurella.toodledo.widget
+package io.github.kurella.toodledo.widget
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import io.github.kurella.toodledo.widget.R
 
 class OAuthCallbackActivity : AppCompatActivity() {
 
@@ -37,7 +39,7 @@ class OAuthCallbackActivity : AppCompatActivity() {
                 val success = try {
                     ToodledoApi(TokenStore(appContext)).exchangeCode(code)
                 } catch (e: Exception) {
-                    android.util.Log.e("ToodledoWidget", "OAuth exchange failed", e)
+                    Log.e("ToodledoWidget", "OAuth exchange failed", e)
                     false
                 }
                 if (success) {

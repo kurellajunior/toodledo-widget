@@ -1,4 +1,4 @@
-package com.kurella.toodledo.widget
+package io.github.kurella.toodledo.widget
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull

@@ -1,5 +1,6 @@
-package com.kurella.toodledo.widget
+package io.github.kurella.toodledo.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -9,6 +10,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import io.github.kurella.toodledo.widget.R
 import java.time.LocalDate
 
 private const val TAG = "ToodledoWidget"
@@ -135,7 +137,7 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
     }
 
     /** Set width and height to the same dp value (requires API 31+). */
-    @android.annotation.SuppressLint("NewApi")
+    @SuppressLint("NewApi")
     private fun RemoteViews.scaleSquare(viewId: Int, dp: Float) {
         setViewLayoutWidth(viewId, dp, TypedValue.COMPLEX_UNIT_DIP)
         setViewLayoutHeight(viewId, dp, TypedValue.COMPLEX_UNIT_DIP)

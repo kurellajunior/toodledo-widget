@@ -7,7 +7,7 @@
         android:shortcutShortLabel="@string/add_task">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.kurella.toodledo.widget"
-            android:targetClass="com.kurella.toodledo.widget.AddTaskActivity" />
+            android:targetPackage="io.github.kurella.toodledo.widget"
+            android:targetClass="io.github.kurella.toodledo.widget.AddTaskActivity" />
     </shortcut>
 </shortcuts>

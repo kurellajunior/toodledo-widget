@@ -1,8 +1,7 @@
 <resources>
     <string name="widget_name">작업</string>
-    <string name="settings_title">위젯 설정</string>
+    <string name="settings_title">Toodledo 위젯 설정</string>
     <string name="not_logged_in">탭하여 Toodledo에 로그인</string>
-    <string name="loading">작업 로드 중…</string>
     <string name="no_tasks">예정된 작업 없음</string>
     <string name="error_offline">오프라인 – 탭하여 재시도</string>
     <string name="error_auth">로그인 만료 – 탭하여 로그인</string>

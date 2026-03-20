@@ -1,8 +1,7 @@
 <resources>
     <string name="widget_name">Aufgaben</string>
-    <string name="settings_title">Widget-Einstellungen</string>
+    <string name="settings_title">Toodledo Widget-Einstellungen</string>
     <string name="not_logged_in">Tippen, um sich bei Toodledo anzumelden</string>
-    <string name="loading">Lade Aufgaben…</string>
     <string name="no_tasks">Keine fälligen Aufgaben</string>
     <string name="error_offline">Offline – tippen zum Wiederholen</string>
     <string name="error_auth">Login abgelaufen – tippen zum Anmelden</string>
@@ -12,7 +11,6 @@
     <string name="section_this_week">Diese Woche</string>
     <string name="section_next_week">Nächste Woche</string>
     <string name="section_later">Später</string>
-    <string name="pref_background_color">Hintergrundfarbe</string>
     <string name="pref_transparency">Transparenz</string>
     <string name="pref_font_size">Schriftgröße</string>
     <string name="login">Anmelden</string>

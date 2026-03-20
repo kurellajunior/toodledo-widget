@@ -1,5 +1,8 @@
-package com.kurella.toodledo.widget
+package io.github.kurella.toodledo.widget
 
+import io.github.kurella.toodledo.widget.Category
+import io.github.kurella.toodledo.widget.Priority
+import io.github.kurella.toodledo.widget.Task
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

@@ -1,8 +1,7 @@
 <resources>
     <string name="widget_name">Задачи</string>
-    <string name="settings_title">Настройки виджета</string>
+    <string name="settings_title">Toodledo – Настройки виджета</string>
     <string name="not_logged_in">Нажмите, чтобы войти в Toodledo</string>
-    <string name="loading">Загрузка задач…</string>
     <string name="no_tasks">Нет запланированных задач</string>
     <string name="error_offline">Нет сети – нажмите для повтора</string>
     <string name="error_auth">Сеанс истёк – нажмите для входа</string>

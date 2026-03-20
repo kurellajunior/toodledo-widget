@@ -1,12 +1,14 @@
-package com.kurella.toodledo.widget
+package io.github.kurella.toodledo.widget
 
 import android.appwidget.AppWidgetManager
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import io.github.kurella.toodledo.widget.R
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -39,7 +41,7 @@ class SettingsActivity : AppCompatActivity() {
                 TaskWidgetProvider.fullUpdate(this)
             } else {
                 val api = ToodledoApi(tokenStore)
-                startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(api.buildAuthUrl())))
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(api.buildAuthUrl())))
             }
         }
 

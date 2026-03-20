@@ -11,11 +11,11 @@ val localProps = Properties().apply {
 }
 
 android {
-    namespace = "com.kurella.toodledo.widget"
+    namespace = "io.github.kurella.toodledo.widget"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.kurella.toodledo.widget"
+        applicationId = "io.github.kurella.toodledo.widget"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

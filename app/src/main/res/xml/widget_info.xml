@@ -12,5 +12,5 @@
     android:updatePeriodMillis="3600000"
     android:previewImage="@mipmap/ic_launcher"
     android:description="@string/widget_name"
-    android:configure="com.kurella.toodledo.widget.SettingsActivity"
+    android:configure="io.github.kurella.toodledo.widget.SettingsActivity"
     android:widgetFeatures="reconfigurable|configuration_optional" />

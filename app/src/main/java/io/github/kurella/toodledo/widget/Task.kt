@@ -1,4 +1,4 @@
-package com.kurella.toodledo.widget
+package io.github.kurella.toodledo.widget
 
 import java.time.LocalDate
 

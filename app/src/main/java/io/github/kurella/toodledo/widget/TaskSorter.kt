@@ -1,6 +1,7 @@
-package com.kurella.toodledo.widget
+package io.github.kurella.toodledo.widget
 
 import android.content.Context
+import io.github.kurella.toodledo.widget.R
 import java.time.LocalDate
 import java.time.temporal.WeekFields
 import java.util.Locale

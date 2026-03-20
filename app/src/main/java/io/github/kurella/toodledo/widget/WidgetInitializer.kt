@@ -1,4 +1,4 @@
-package com.kurella.toodledo.widget
+package io.github.kurella.toodledo.widget
 
 import android.appwidget.AppWidgetManager
 import android.content.BroadcastReceiver

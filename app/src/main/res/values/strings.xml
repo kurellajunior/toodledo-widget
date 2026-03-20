@@ -1,9 +1,8 @@
 <resources>
     <string name="app_name">Toodledo Widget</string>
     <string name="widget_name">Tasks</string>
-    <string name="settings_title">Widget Settings</string>
+    <string name="settings_title">Toodledo Widget Settings</string>
     <string name="not_logged_in">Tap to log in to Toodledo</string>
-    <string name="loading">Loading tasks…</string>
     <string name="no_tasks">No tasks due</string>
     <string name="error_offline">Offline – tap to retry</string>
     <string name="error_auth">Login expired – tap to log in</string>
@@ -13,7 +12,6 @@
     <string name="section_this_week">This week</string>
     <string name="section_next_week">Next week</string>
     <string name="section_later">Later</string>
-    <string name="pref_background_color">Background color</string>
     <string name="pref_transparency">Transparency</string>
     <string name="pref_font_size">Font size</string>
     <string name="login">Log in</string>

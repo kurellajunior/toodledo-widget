@@ -1,4 +1,4 @@
-package com.kurella.toodledo.widget
+package io.github.kurella.toodledo.widget
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -8,9 +8,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
+import android.widget.Toast
+import io.github.kurella.toodledo.widget.R
 
 private const val TAG = "ToodledoWidget"
 const val TOODLEDO_PACKAGE = "com.toodledo"
@@ -45,7 +49,7 @@ fun openToodledo(context: Context) {
 class TaskWidgetProvider : AppWidgetProvider() {
 
     companion object {
-        const val ACTION_REFRESH = "com.kurella.toodledo.widget.REFRESH"
+        const val ACTION_REFRESH = "io.github.kurella.toodledo.widget.REFRESH"
 
         private fun widgetIds(context: Context): Pair<AppWidgetManager, IntArray> {
             val manager = AppWidgetManager.getInstance(context)
@@ -193,9 +197,9 @@ class TaskWidgetProvider : AppWidgetProvider() {
                         if (success) {
                             refresh(appContext)
                         } else {
-                            android.os.Handler(android.os.Looper.getMainLooper()).post {
-                                android.widget.Toast.makeText(appContext,
-                                    R.string.error_offline, android.widget.Toast.LENGTH_SHORT).show()
+                            Handler(Looper.getMainLooper()).post {
+                                Toast.makeText(appContext,
+                                    R.string.error_offline, Toast.LENGTH_SHORT).show()
                             }
                         }
                     }.start()

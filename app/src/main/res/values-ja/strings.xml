@@ -1,8 +1,7 @@
 <resources>
     <string name="widget_name">タスク</string>
-    <string name="settings_title">ウィジェット設定</string>
+    <string name="settings_title">Toodledo ウィジェット設定</string>
     <string name="not_logged_in">タップして Toodledo にログイン</string>
-    <string name="loading">タスクを読み込み中…</string>
     <string name="no_tasks">期限のタスクはありません</string>
     <string name="error_offline">オフライン – タップして再試行</string>
     <string name="error_auth">ログイン期限切れ – タップしてログイン</string>

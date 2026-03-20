@@ -1,8 +1,7 @@
 <resources>
     <string name="widget_name">Tâches</string>
-    <string name="settings_title">Paramètres du widget</string>
+    <string name="settings_title">Toodledo – Paramètres du widget</string>
     <string name="not_logged_in">Appuyez pour vous connecter à Toodledo</string>
-    <string name="loading">Chargement des tâches…</string>
     <string name="no_tasks">Aucune tâche prévue</string>
     <string name="error_offline">Hors ligne – appuyez pour réessayer</string>
     <string name="error_auth">Session expirée – appuyez pour vous connecter</string>

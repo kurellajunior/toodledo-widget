@@ -1,6 +1,7 @@
-package com.kurella.toodledo.widget
+package io.github.kurella.toodledo.widget
 
 import android.util.Base64
+import io.github.kurella.toodledo.widget.BuildConfig
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request

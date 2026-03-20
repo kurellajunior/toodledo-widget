@@ -1,4 +1,4 @@
-package com.kurella.toodledo.widget
+package io.github.kurella.toodledo.widget
 
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
@@ -15,7 +15,7 @@ class FactoryRegressionTest {
 
     @Test
     fun `Factory onCreate does not call loadTasks`() {
-        val source = File("src/main/java/com/kurella/toodledo/widget/TaskWidgetService.kt")
+        val source = File("src/main/java/io/github/kurella/toodledo/widget/TaskWidgetService.kt")
             .readText()
 
         // Extract the onCreate method body
