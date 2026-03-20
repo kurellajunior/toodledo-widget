@@ -77,7 +77,7 @@ class ToodledoApi(private val tokenStore: TokenStore) {
         val request = Request.Builder()
             .url("$baseUrl/tasks/get.php" +
                 "?access_token=${tokenStore.accessToken}" +
-                "&fields=priority,startdate,duedate,repeat" +
+                "&fields=priority,startdate,duedate,repeat,note" +
                 "&comp=0")
             .build()
 
@@ -98,7 +98,8 @@ class ToodledoApi(private val tokenStore: TokenStore) {
                 priority = Priority.from(obj.optInt("priority", 1)),
                 startDate = epochToDate(obj.optLong("startdate", 0)),
                 dueDate = epochToDate(dueEpoch)!!,
-                repeat = obj.optString("repeat", "")
+                repeat = obj.optString("repeat", ""),
+                hasNote = obj.optString("note", "").isNotEmpty()
             )
         }
         return tasks

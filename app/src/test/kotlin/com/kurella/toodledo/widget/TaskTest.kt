@@ -112,6 +112,20 @@ class TaskTest {
     }
 
     @Nested
+    inner class HasNoteTest {
+
+        @Test
+        fun `hasNote defaults to false`() {
+            assertFalse(task().hasNote)
+        }
+
+        @Test
+        fun `hasNote true when set`() {
+            assertTrue(task().copy(hasNote = true).hasNote)
+        }
+    }
+
+    @Nested
     inner class RepeatingTest {
 
         @Test

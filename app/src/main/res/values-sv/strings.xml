@@ -1,0 +1,22 @@
+<resources>
+    <string name="settings_title">Widgetinställningar</string>
+    <string name="not_logged_in">Tryck för att logga in på Toodledo</string>
+    <string name="loading">Laddar uppgifter…</string>
+    <string name="no_tasks">Inga uppgifter att göra</string>
+    <string name="error_offline">Offline – tryck för att försöka igen</string>
+    <string name="error_auth">Sessionen har gått ut – tryck för att logga in</string>
+    <string name="section_overdue">Försenad</string>
+    <string name="section_today">Idag</string>
+    <string name="section_tomorrow">Imorgon</string>
+    <string name="section_this_week">Denna vecka</string>
+    <string name="section_next_week">Nästa vecka</string>
+    <string name="section_later">Senare</string>
+    <string name="pref_transparency">Transparens</string>
+    <string name="pref_font_size">Teckenstorlek</string>
+    <string name="login">Logga in</string>
+    <string name="logout">Logga ut</string>
+    <string name="refresh">↻ Uppdatera</string>
+    <string name="login_hint">Logga in på Toodledo för att visa dina uppgifter.</string>
+    <string name="logout_hint">Du är inloggad. Dina uppgifter visas på widgeten.</string>
+    <string name="add_task">Lägg till uppgift</string>
+</resources>

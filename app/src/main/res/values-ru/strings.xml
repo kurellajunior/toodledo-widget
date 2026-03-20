@@ -1,0 +1,22 @@
+<resources>
+    <string name="settings_title">Настройки виджета</string>
+    <string name="not_logged_in">Нажмите, чтобы войти в Toodledo</string>
+    <string name="loading">Загрузка задач…</string>
+    <string name="no_tasks">Нет запланированных задач</string>
+    <string name="error_offline">Нет сети – нажмите для повтора</string>
+    <string name="error_auth">Сеанс истёк – нажмите для входа</string>
+    <string name="section_overdue">Просрочено</string>
+    <string name="section_today">Сегодня</string>
+    <string name="section_tomorrow">Завтра</string>
+    <string name="section_this_week">На этой неделе</string>
+    <string name="section_next_week">На следующей неделе</string>
+    <string name="section_later">Позже</string>
+    <string name="pref_transparency">Прозрачность</string>
+    <string name="pref_font_size">Размер шрифта</string>
+    <string name="login">Войти</string>
+    <string name="logout">Выйти</string>
+    <string name="refresh">↻ Обновить</string>
+    <string name="login_hint">Войдите в Toodledo, чтобы отобразить ваши задачи.</string>
+    <string name="logout_hint">Вы вошли в систему. Ваши задачи отображаются на виджете.</string>
+    <string name="add_task">Добавить задачу</string>
+</resources>

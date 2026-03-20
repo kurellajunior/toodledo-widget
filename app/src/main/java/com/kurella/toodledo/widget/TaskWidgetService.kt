@@ -96,6 +96,9 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 setViewLayoutWidth(R.id.priority_frame, boxSizeDp, TypedValue.COMPLEX_UNIT_DIP)
                 setViewLayoutHeight(R.id.priority_frame, boxSizeDp, TypedValue.COMPLEX_UNIT_DIP)
+                val noteIconDp = 14f * fontScale
+                setViewLayoutWidth(R.id.note_icon, noteIconDp, TypedValue.COMPLEX_UNIT_DIP)
+                setViewLayoutHeight(R.id.note_icon, noteIconDp, TypedValue.COMPLEX_UNIT_DIP)
             }
             setInt(R.id.priority_box, "setBackgroundColor", task.priority.color)
 
@@ -103,6 +106,13 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
                 setInt(R.id.task_row, "setBackgroundColor", overdueColor)
             } else {
                 setInt(R.id.task_row, "setBackgroundColor", 0x00000000)
+            }
+
+            if (task.hasNote) {
+                setViewVisibility(R.id.note_icon, android.view.View.VISIBLE)
+                setInt(R.id.note_icon, "setColorFilter", textColor)
+            } else {
+                setViewVisibility(R.id.note_icon, android.view.View.GONE)
             }
 
             if (task.isRepeating) {

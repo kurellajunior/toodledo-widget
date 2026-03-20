@@ -1,0 +1,22 @@
+<resources>
+    <string name="settings_title">ウィジェット設定</string>
+    <string name="not_logged_in">タップして Toodledo にログイン</string>
+    <string name="loading">タスクを読み込み中…</string>
+    <string name="no_tasks">期限のタスクはありません</string>
+    <string name="error_offline">オフライン – タップして再試行</string>
+    <string name="error_auth">ログイン期限切れ – タップしてログイン</string>
+    <string name="section_overdue">期限超過</string>
+    <string name="section_today">今日</string>
+    <string name="section_tomorrow">明日</string>
+    <string name="section_this_week">今週</string>
+    <string name="section_next_week">来週</string>
+    <string name="section_later">それ以降</string>
+    <string name="pref_transparency">透明度</string>
+    <string name="pref_font_size">文字サイズ</string>
+    <string name="login">ログイン</string>
+    <string name="logout">ログアウト</string>
+    <string name="refresh">↻ 更新</string>
+    <string name="login_hint">Toodledo にログインしてタスクを表示します。</string>
+    <string name="logout_hint">ログイン済みです。タスクはウィジェットに表示されています。</string>
+    <string name="add_task">タスクを追加</string>
+</resources>

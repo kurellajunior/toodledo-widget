@@ -1,0 +1,22 @@
+<resources>
+    <string name="settings_title">Paramètres du widget</string>
+    <string name="not_logged_in">Appuyez pour vous connecter à Toodledo</string>
+    <string name="loading">Chargement des tâches…</string>
+    <string name="no_tasks">Aucune tâche prévue</string>
+    <string name="error_offline">Hors ligne – appuyez pour réessayer</string>
+    <string name="error_auth">Session expirée – appuyez pour vous connecter</string>
+    <string name="section_overdue">En retard</string>
+    <string name="section_today">Aujourd\'hui</string>
+    <string name="section_tomorrow">Demain</string>
+    <string name="section_this_week">Cette semaine</string>
+    <string name="section_next_week">Semaine prochaine</string>
+    <string name="section_later">Plus tard</string>
+    <string name="pref_transparency">Transparence</string>
+    <string name="pref_font_size">Taille de police</string>
+    <string name="login">Connexion</string>
+    <string name="logout">Déconnexion</string>
+    <string name="refresh">↻ Actualiser</string>
+    <string name="login_hint">Connectez-vous à Toodledo pour afficher vos tâches.</string>
+    <string name="logout_hint">Vous êtes connecté. Vos tâches sont affichées sur le widget.</string>
+    <string name="add_task">Ajouter une tâche</string>
+</resources>

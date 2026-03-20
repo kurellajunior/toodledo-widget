@@ -13,11 +13,19 @@ of its respective owner.
 
 - Shows overdue, due today, and upcoming tasks at a glance
 - Color-coded priority indicators
+- Note indicator for tasks with additional text
+- Repeat indicator for recurring tasks
 - Mark tasks as complete directly from the widget
 - Tap a task to open it in the Toodledo app or website
+- "Add task" shortcut (long-press on widget/app icon)
 - Pull down to refresh
 - Automatic hourly background sync
 - Configurable background color, transparency, and font size
+
+## Supported Languages
+
+English, Chinese (Simplified), Dutch, French, German, Italian, Japanese,
+Korean, Portuguese, Russian, Spanish, Swedish
 
 ## License
 

@@ -42,6 +42,16 @@
         android:textSize="14sp"
         android:textColor="#FF000000" />
 
+    <!-- Note indicator -->
+    <ImageView
+        android:id="@+id/note_icon"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:src="@drawable/ic_note"
+        android:visibility="gone"
+        android:layout_marginStart="4dp"
+        android:contentDescription="@null" />
+
     <!-- Repeat indicator -->
     <TextView
         android:id="@+id/repeat_icon"

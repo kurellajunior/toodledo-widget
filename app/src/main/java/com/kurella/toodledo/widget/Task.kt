@@ -8,7 +8,8 @@ data class Task(
     val priority: Priority,
     val startDate: LocalDate?,
     val dueDate: LocalDate,
-    val repeat: String
+    val repeat: String,
+    val hasNote: Boolean = false
 ) {
     val isRepeating: Boolean get() = repeat.isNotEmpty() && repeat != "None"
 

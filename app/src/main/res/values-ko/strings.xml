@@ -1,0 +1,22 @@
+<resources>
+    <string name="settings_title">위젯 설정</string>
+    <string name="not_logged_in">탭하여 Toodledo에 로그인</string>
+    <string name="loading">작업 로드 중…</string>
+    <string name="no_tasks">예정된 작업 없음</string>
+    <string name="error_offline">오프라인 – 탭하여 재시도</string>
+    <string name="error_auth">로그인 만료 – 탭하여 로그인</string>
+    <string name="section_overdue">기한 초과</string>
+    <string name="section_today">오늘</string>
+    <string name="section_tomorrow">내일</string>
+    <string name="section_this_week">이번 주</string>
+    <string name="section_next_week">다음 주</string>
+    <string name="section_later">나중에</string>
+    <string name="pref_transparency">투명도</string>
+    <string name="pref_font_size">글꼴 크기</string>
+    <string name="login">로그인</string>
+    <string name="logout">로그아웃</string>
+    <string name="refresh">↻ 새로고침</string>
+    <string name="login_hint">Toodledo에 로그인하여 작업을 표시하세요.</string>
+    <string name="logout_hint">로그인되어 있습니다. 작업이 위젯에 표시됩니다.</string>
+    <string name="add_task">작업 추가</string>
+</resources>
