@@ -2,9 +2,12 @@ package io.github.kurella.toodledo.widget
 
 import android.content.Context
 import android.content.SharedPreferences
+// TODO security-crypto is deprecated with no official successor.
+//  Migrate to DataStore + Tink when Google provides a stable replacement.
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
+@Suppress("DEPRECATION")
 class TokenStore(context: Context) {
 
     private val prefs: SharedPreferences by lazy {

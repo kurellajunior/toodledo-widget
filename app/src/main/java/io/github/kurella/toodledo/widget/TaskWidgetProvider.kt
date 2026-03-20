@@ -61,6 +61,8 @@ class TaskWidgetProvider : AppWidgetProvider() {
 
         fun refresh(context: Context) {
             val (manager, ids) = widgetIds(context)
+            // TODO migrate to RemoteCollectionItems when minSdk >= 31 (API 35 replacement)
+            @Suppress("DEPRECATION")
             manager.notifyAppWidgetViewDataChanged(ids, R.id.task_list)
         }
 
@@ -150,6 +152,8 @@ class TaskWidgetProvider : AppWidgetProvider() {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
                 data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
             }
+            // TODO migrate to RemoteCollectionItems when minSdk >= 31 (API 35 replacement)
+            @Suppress("DEPRECATION")
             views.setRemoteAdapter(R.id.task_list, serviceIntent)
             views.setScrollPosition(R.id.task_list, 0)
             views.setEmptyView(R.id.task_list, R.id.empty_view)
@@ -175,6 +179,8 @@ class TaskWidgetProvider : AppWidgetProvider() {
             manager.updateAppWidget(widgetId, views)
         }
 
+        // TODO migrate to RemoteCollectionItems when minSdk >= 31 (API 35 replacement)
+        @Suppress("DEPRECATION")
         manager.notifyAppWidgetViewDataChanged(widgetIds, R.id.task_list)
         RefreshWorker.schedule(context)
     }
