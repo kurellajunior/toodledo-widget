@@ -19,4 +19,5 @@
     <string name="refresh">↻ Aktualisieren</string>
     <string name="login_hint">Melde dich bei Toodledo an, um deine Aufgaben anzuzeigen.</string>
     <string name="logout_hint">Du bist angemeldet. Deine Aufgaben werden im Widget angezeigt.</string>
+    <string name="add_task">Aufgabe hinzufügen</string>
 </resources>
