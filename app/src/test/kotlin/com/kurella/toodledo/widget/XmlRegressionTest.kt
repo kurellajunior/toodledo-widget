@@ -63,15 +63,11 @@ class XmlRegressionTest {
         val root = parseXml("src/main/AndroidManifest.xml")
         val queries = root.getElementsByTagName("queries")
         assertTrue(queries.length > 0, "Manifest must have <queries> element")
-        val packages = queries.item(0).childNodes
-        var found = false
-        for (i in 0 until packages.length) {
-            val node = packages.item(i)
-            if (node.nodeName == "package") {
-                val name = node.attributes.getNamedItemNS(ns, "name")?.nodeValue
-                if (name == "com.toodledo") found = true
-            }
-        }
+        val children = queries.item(0).childNodes
+        val found = (0 until children.length)
+            .map { children.item(it) }
+            .any { it.nodeName == "package" &&
+                   it.attributes.getNamedItemNS(ns, "name")?.nodeValue == "com.toodledo" }
         assertTrue(found, "Manifest must declare <package android:name=\"com.toodledo\" /> in <queries>")
     }
 }

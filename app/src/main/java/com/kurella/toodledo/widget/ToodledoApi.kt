@@ -89,23 +89,20 @@ class ToodledoApi(private val tokenStore: TokenStore) {
             if (!response.isSuccessful) return@use null
             val array = JSONArray(response.body?.string() ?: return@use null)
             // First element is metadata (total count etc.), skip it
-            val tasks = mutableListOf<Task>()
-            for (i in 1 until array.length()) {
-                val entry = array.getJSONObject(i)
-                val dueEpoch = entry.optLong("duedate", 0)
-                if (dueEpoch == 0L) continue
-
-                tasks += Task(
-                    id = entry.getLong("id"),
-                    title = entry.getString("title"),
-                    priority = Priority.from(entry.optInt("priority", 1)),
-                    startDate = epochToDate(entry.optLong("startdate", 0)),
-                    dueDate = epochToDate(dueEpoch)!!,
-                    repeat = entry.optString("repeat", ""),
-                    hasNote = entry.optString("note", "").isNotEmpty()
-                )
-            }
-            tasks
+            (1 until array.length())
+                .map { array.getJSONObject(it) }
+                .filter { it.optLong("duedate", 0) != 0L }
+                .map { entry ->
+                    Task(
+                        id = entry.getLong("id"),
+                        title = entry.getString("title"),
+                        priority = Priority.from(entry.optInt("priority", 1)),
+                        startDate = epochToDate(entry.optLong("startdate", 0)),
+                        dueDate = epochToDate(entry.optLong("duedate", 0))!!,
+                        repeat = entry.optString("repeat", ""),
+                        hasNote = entry.optString("note", "").isNotEmpty()
+                    )
+                }
         }
     }
 

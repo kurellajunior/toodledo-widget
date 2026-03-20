@@ -13,14 +13,14 @@ import java.time.LocalDate
 
 private const val TAG = "ToodledoWidget"
 
-private const val OVERDUE_BACKGROUND = 0x40F44336  // translucent red
+private const val OVERDUE_BACKGROUND = 0x40F44336
 private const val TRANSPARENT = 0x00000000
 
 private const val BASE_TEXT_SP = 14f
 private const val BASE_SECTION_SP = 11f
 private const val BASE_BOX_DP = 16f
 private const val BASE_ICON_DP = 14f
-private const val SECTION_TEXT_COLOR = 0xFFFFFFFF.toInt()  // white on dark section bar
+private const val SECTION_TEXT_COLOR = 0xFFFFFFFF.toInt()
 
 class TaskWidgetService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory =
@@ -105,25 +105,17 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
             setTextColor(R.id.task_title, textColor)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val boxDp = BASE_BOX_DP * fontScale
-                setViewLayoutWidth(R.id.priority_frame, boxDp, TypedValue.COMPLEX_UNIT_DIP)
-                setViewLayoutHeight(R.id.priority_frame, boxDp, TypedValue.COMPLEX_UNIT_DIP)
-                val iconDp = BASE_ICON_DP * fontScale
-                setViewLayoutWidth(R.id.note_icon, iconDp, TypedValue.COMPLEX_UNIT_DIP)
-                setViewLayoutHeight(R.id.note_icon, iconDp, TypedValue.COMPLEX_UNIT_DIP)
-                setViewLayoutWidth(R.id.repeat_icon, iconDp, TypedValue.COMPLEX_UNIT_DIP)
-                setViewLayoutHeight(R.id.repeat_icon, iconDp, TypedValue.COMPLEX_UNIT_DIP)
+                scaleSquare(R.id.priority_frame, BASE_BOX_DP * fontScale)
+                scaleSquare(R.id.note_icon, BASE_ICON_DP * fontScale)
+                scaleSquare(R.id.repeat_icon, BASE_ICON_DP * fontScale)
             }
 
             setInt(R.id.priority_box, "setBackgroundColor", task.priority.color)
             setInt(R.id.task_row, "setBackgroundColor",
                 if (overdue) OVERDUE_BACKGROUND else TRANSPARENT)
 
-            setViewVisibility(R.id.note_icon, if (task.hasNote) View.VISIBLE else View.GONE)
-            if (task.hasNote) setInt(R.id.note_icon, "setColorFilter", textColor)
-
-            setViewVisibility(R.id.repeat_icon, if (task.isRepeating) View.VISIBLE else View.GONE)
-            if (task.isRepeating) setInt(R.id.repeat_icon, "setColorFilter", textColor)
+            setIndicator(R.id.note_icon, task.hasNote)
+            setIndicator(R.id.repeat_icon, task.isRepeating)
 
             setOnClickFillInIntent(R.id.priority_frame, Intent().apply {
                 putExtra("task_id", task.id)
@@ -134,6 +126,19 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
                 putExtra("action", "open")
             })
         }
+    }
+
+    /** Show/hide an indicator icon and tint it to match the theme text color. */
+    private fun RemoteViews.setIndicator(viewId: Int, visible: Boolean) {
+        setViewVisibility(viewId, if (visible) View.VISIBLE else View.GONE)
+        if (visible) setInt(viewId, "setColorFilter", textColor)
+    }
+
+    /** Set width and height to the same dp value (requires API 31+). */
+    @android.annotation.SuppressLint("NewApi")
+    private fun RemoteViews.scaleSquare(viewId: Int, dp: Float) {
+        setViewLayoutWidth(viewId, dp, TypedValue.COMPLEX_UNIT_DIP)
+        setViewLayoutHeight(viewId, dp, TypedValue.COMPLEX_UNIT_DIP)
     }
 
     private fun buildRefreshView(): RemoteViews {
@@ -151,7 +156,6 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
 
     override fun getLoadingView(): RemoteViews? = null
 
-    /** Two layout types: widget_task_row and widget_section_header (reused for refresh). */
     override fun getViewTypeCount(): Int = 2
     override fun getItemId(position: Int): Long = position.toLong()
     override fun hasStableIds(): Boolean = false

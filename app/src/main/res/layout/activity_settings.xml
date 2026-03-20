@@ -10,7 +10,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Transparency -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,7 +38,6 @@
                 android:text="25%" />
         </LinearLayout>
 
-        <!-- Font size -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -68,7 +66,6 @@
                 android:text="100%" />
         </LinearLayout>
 
-        <!-- Login/Logout -->
         <TextView
             android:id="@+id/login_hint"
             android:layout_width="match_parent"

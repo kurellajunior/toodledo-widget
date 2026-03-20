@@ -11,7 +11,6 @@
     android:paddingBottom="2dp"
     android:id="@+id/task_row">
 
-    <!-- Priority color box with border -->
     <FrameLayout
         android:id="@+id/priority_frame"
         android:layout_width="16dp"
@@ -32,7 +31,6 @@
             android:text="" />
     </FrameLayout>
 
-    <!-- Task title -->
     <TextView
         android:id="@+id/task_title"
         android:layout_width="0dp"
@@ -43,7 +41,6 @@
         android:textSize="14sp"
         android:textColor="#FF000000" />
 
-    <!-- Note indicator -->
     <ImageView
         android:id="@+id/note_icon"
         android:layout_width="14dp"
@@ -53,7 +50,6 @@
         android:layout_marginStart="4dp"
         android:contentDescription="@null" />
 
-    <!-- Repeat indicator -->
     <ImageView
         android:id="@+id/repeat_icon"
         android:layout_width="14dp"

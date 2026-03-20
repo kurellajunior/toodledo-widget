@@ -18,41 +18,18 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val transparencyBar = findViewById<SeekBar>(R.id.transparency_bar)
-        val transparencyLabel = findViewById<TextView>(R.id.transparency_label)
-        val fontSizeBar = findViewById<SeekBar>(R.id.font_size_bar)
-        val fontSizeLabel = findViewById<TextView>(R.id.font_size_label)
         val loginButton = findViewById<Button>(R.id.login_button)
 
-        // Transparency: 0-100% in 5% steps, default 25%
-        transparencyBar.progress = prefs.getInt(PREF_TRANSPARENCY, 25) / 5
-        transparencyLabel.text = "${transparencyBar.progress * 5}%"
-        transparencyBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(bar: SeekBar, value: Int, fromUser: Boolean) {
-                transparencyLabel.text = "${value * 5}%"
-            }
-            override fun onStartTrackingTouch(bar: SeekBar) {}
-            override fun onStopTrackingTouch(bar: SeekBar) {
-                prefs.edit().putInt(PREF_TRANSPARENCY, bar.progress * 5).apply()
-                TaskWidgetProvider.updateLayout(this@SettingsActivity)
-            }
-        })
+        bindSeekBar(
+            barId = R.id.transparency_bar, labelId = R.id.transparency_label,
+            prefKey = PREF_TRANSPARENCY, default = 25, offset = 0, step = 5
+        ) { TaskWidgetProvider.updateLayout(this) }
 
-        // Font size: 50-200% in 5% steps, default 100%
-        fontSizeBar.progress = (prefs.getInt(PREF_FONT_SIZE, 100) - 50) / 5
-        fontSizeLabel.text = "${fontSizeBar.progress * 5 + 50}%"
-        fontSizeBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(bar: SeekBar, value: Int, fromUser: Boolean) {
-                fontSizeLabel.text = "${value * 5 + 50}%"
-            }
-            override fun onStartTrackingTouch(bar: SeekBar) {}
-            override fun onStopTrackingTouch(bar: SeekBar) {
-                prefs.edit().putInt(PREF_FONT_SIZE, bar.progress * 5 + 50).apply()
-                TaskWidgetProvider.fullUpdate(this@SettingsActivity)
-            }
-        })
+        bindSeekBar(
+            barId = R.id.font_size_bar, labelId = R.id.font_size_label,
+            prefKey = PREF_FONT_SIZE, default = 100, offset = 50, step = 5
+        ) { TaskWidgetProvider.fullUpdate(this) }
 
-        // Login / Logout
         val tokenStore = TokenStore(this)
         updateLoginButton(loginButton, tokenStore)
         loginButton.setOnClickListener {
@@ -66,7 +43,6 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        // If opened as widget configure activity, always confirm so widget isn't removed
         val widgetId = intent?.getIntExtra(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
@@ -76,11 +52,9 @@ class SettingsActivity : AppCompatActivity() {
             setResult(RESULT_OK, Intent().apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
             })
-            // Trigger full widget update when configure finishes
             TaskWidgetProvider.fullUpdate(this)
         }
 
-        // Schedule periodic refresh
         RefreshWorker.schedule(this)
     }
 
@@ -88,6 +62,29 @@ class SettingsActivity : AppCompatActivity() {
         super.onResume()
         val loginButton = findViewById<Button>(R.id.login_button)
         updateLoginButton(loginButton, TokenStore(this))
+    }
+
+    private fun bindSeekBar(
+        barId: Int, labelId: Int,
+        prefKey: String, default: Int, offset: Int, step: Int,
+        onCommit: () -> Unit
+    ) {
+        val bar = findViewById<SeekBar>(barId)
+        val label = findViewById<TextView>(labelId)
+        fun displayValue(progress: Int) = "${progress * step + offset}%"
+
+        bar.progress = (prefs.getInt(prefKey, default) - offset) / step
+        label.text = displayValue(bar.progress)
+        bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(bar: SeekBar, value: Int, fromUser: Boolean) {
+                label.text = displayValue(value)
+            }
+            override fun onStartTrackingTouch(bar: SeekBar) {}
+            override fun onStopTrackingTouch(bar: SeekBar) {
+                prefs.edit().putInt(prefKey, bar.progress * step + offset).apply()
+                onCommit()
+            }
+        })
     }
 
     private fun updateLoginButton(button: Button, tokenStore: TokenStore) {

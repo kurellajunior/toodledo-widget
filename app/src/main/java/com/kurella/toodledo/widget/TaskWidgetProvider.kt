@@ -13,16 +13,14 @@ import android.view.View
 import android.widget.RemoteViews
 
 private const val TAG = "ToodledoWidget"
-private const val TOODLEDO_PACKAGE = "com.toodledo"
+const val TOODLEDO_PACKAGE = "com.toodledo"
 
-// SharedPreferences keys and defaults
 const val PREFS_NAME = "widget_settings"
 const val PREF_TRANSPARENCY = "transparency"
 const val PREF_FONT_SIZE = "font_size"
 private const val DEFAULT_TRANSPARENCY = 25
 const val DEFAULT_FONT_SIZE = 100
 
-// Theme colors (internal — used by TaskWidgetService)
 internal const val LIGHT_BASE = 0xFFFFFF
 internal const val DARK_BASE = 0x303030
 internal const val LIGHT_SECTION_BASE = 0x424242
@@ -30,40 +28,53 @@ internal const val DARK_SECTION_BASE = 0x505050
 internal const val LIGHT_TEXT = 0xFF000000.toInt()
 internal const val DARK_TEXT = 0xFFE0E0E0.toInt()
 
+/** Opens Toodledo app if installed, otherwise falls back to web. */
+fun openToodledo(context: Context) {
+    val appIntent = context.packageManager.getLaunchIntentForPackage(TOODLEDO_PACKAGE)
+    if (appIntent != null) {
+        appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(appIntent)
+    } else {
+        context.startActivity(Intent(Intent.ACTION_VIEW,
+            Uri.parse(ToodledoApi.WEB_TASKS_URL)).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        })
+    }
+}
+
 class TaskWidgetProvider : AppWidgetProvider() {
 
     companion object {
         const val ACTION_REFRESH = "com.kurella.toodledo.widget.REFRESH"
 
-        fun refresh(context: Context) {
+        private fun widgetIds(context: Context): Pair<AppWidgetManager, IntArray> {
             val manager = AppWidgetManager.getInstance(context)
-            val widgetIds = manager.getAppWidgetIds(
+            val ids = manager.getAppWidgetIds(
                 ComponentName(context, TaskWidgetProvider::class.java)
             )
-            manager.notifyAppWidgetViewDataChanged(widgetIds, R.id.task_list)
+            return manager to ids
+        }
+
+        fun refresh(context: Context) {
+            val (manager, ids) = widgetIds(context)
+            manager.notifyAppWidgetViewDataChanged(ids, R.id.task_list)
         }
 
         /** Full update including layout changes (transparency, status line). */
         fun fullUpdate(context: Context) {
-            val manager = AppWidgetManager.getInstance(context)
-            val widgetIds = manager.getAppWidgetIds(
-                ComponentName(context, TaskWidgetProvider::class.java)
-            )
-            if (widgetIds.isNotEmpty()) {
-                TaskWidgetProvider().onUpdate(context, manager, widgetIds)
+            val (manager, ids) = widgetIds(context)
+            if (ids.isNotEmpty()) {
+                TaskWidgetProvider().onUpdate(context, manager, ids)
             }
         }
 
         /** Layout-only update (background color) without rebinding adapter. */
         fun updateLayout(context: Context) {
-            val manager = AppWidgetManager.getInstance(context)
-            val widgetIds = manager.getAppWidgetIds(
-                ComponentName(context, TaskWidgetProvider::class.java)
-            )
-            if (widgetIds.isEmpty()) return
+            val (manager, ids) = widgetIds(context)
+            if (ids.isEmpty()) return
 
             val bgColor = resolveBackgroundColor(context)
-            for (widgetId in widgetIds) {
+            for (widgetId in ids) {
                 val views = RemoteViews(context.packageName, R.layout.widget_task_list)
                 views.setInt(R.id.widget_background, "setBackgroundColor", bgColor)
                 manager.partiallyUpdateAppWidget(widgetId, views)
@@ -131,7 +142,6 @@ class TaskWidgetProvider : AppWidgetProvider() {
                 views.setViewVisibility(R.id.status_line, View.GONE)
             }
 
-            // ListView adapter
             val serviceIntent = Intent(context, TaskWidgetService::class.java).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
                 data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
@@ -140,7 +150,6 @@ class TaskWidgetProvider : AppWidgetProvider() {
             views.setScrollPosition(R.id.task_list, 0)
             views.setEmptyView(R.id.task_list, R.id.empty_view)
 
-            // Item click template
             val clickIntent = Intent(context, TaskWidgetProvider::class.java).apply {
                 action = "item_click"
             }
@@ -205,16 +214,4 @@ class TaskWidgetProvider : AppWidgetProvider() {
         }
     }
 
-    private fun openToodledo(context: Context) {
-        val appIntent = context.packageManager.getLaunchIntentForPackage(TOODLEDO_PACKAGE)
-        if (appIntent != null) {
-            appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(appIntent)
-        } else {
-            context.startActivity(Intent(Intent.ACTION_VIEW,
-                Uri.parse(ToodledoApi.WEB_TASKS_URL)).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            })
-        }
-    }
 }
