@@ -7,6 +7,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject
+import org.json.JSONTokener
 import java.net.URLEncoder
 import java.time.Instant
 import java.time.LocalDate
@@ -124,7 +125,8 @@ class ToodledoApi(private val tokenStore: TokenStore) {
         return client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) return@use false
             val responseBody = response.body?.string() ?: return@use false
-            !JSONObject(responseBody).has("errorCode")
+            // Toodledo returns a JSONArray on success, a JSONObject with errorCode on failure
+            JSONTokener(responseBody).nextValue() is JSONArray
         }
     }
 
