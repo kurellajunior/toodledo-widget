@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="4dp"
+    android:paddingEnd="4dp"
+    android:paddingTop="2dp"
+    android:paddingBottom="2dp"
+    android:id="@+id/task_row">
+
+    <!-- Priority color box with border -->
+    <FrameLayout
+        android:id="@+id/priority_frame"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginEnd="6dp">
+
+        <TextView
+            android:id="@+id/priority_box"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FF4CAF50"
+            android:text="" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/priority_box_border"
+            android:text="" />
+    </FrameLayout>
+
+    <!-- Task title -->
+    <TextView
+        android:id="@+id/task_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="14sp"
+        android:textColor="#FF000000" />
+
+    <!-- Repeat indicator -->
+    <TextView
+        android:id="@+id/repeat_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="⟳"
+        android:textSize="18sp"
+        android:textColor="#FF000000"
+        android:visibility="gone"
+        android:layout_marginStart="4dp" />
+</LinearLayout>
