@@ -90,15 +90,15 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
         return RemoteViews(context.packageName, R.layout.widget_task_row).apply {
             setTextViewText(R.id.task_title, task.title)
             setTextViewTextSize(R.id.task_title, TypedValue.COMPLEX_UNIT_SP, 14f * fontScale)
-            setTextViewTextSize(R.id.repeat_icon, TypedValue.COMPLEX_UNIT_SP, 18f * fontScale)
             setTextColor(R.id.task_title, textColor)
-            setTextColor(R.id.repeat_icon, textColor)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 setViewLayoutWidth(R.id.priority_frame, boxSizeDp, TypedValue.COMPLEX_UNIT_DIP)
                 setViewLayoutHeight(R.id.priority_frame, boxSizeDp, TypedValue.COMPLEX_UNIT_DIP)
-                val noteIconDp = 14f * fontScale
-                setViewLayoutWidth(R.id.note_icon, noteIconDp, TypedValue.COMPLEX_UNIT_DIP)
-                setViewLayoutHeight(R.id.note_icon, noteIconDp, TypedValue.COMPLEX_UNIT_DIP)
+                val iconDp = 14f * fontScale
+                setViewLayoutWidth(R.id.note_icon, iconDp, TypedValue.COMPLEX_UNIT_DIP)
+                setViewLayoutHeight(R.id.note_icon, iconDp, TypedValue.COMPLEX_UNIT_DIP)
+                setViewLayoutWidth(R.id.repeat_icon, iconDp, TypedValue.COMPLEX_UNIT_DIP)
+                setViewLayoutHeight(R.id.repeat_icon, iconDp, TypedValue.COMPLEX_UNIT_DIP)
             }
             setInt(R.id.priority_box, "setBackgroundColor", task.priority.color)
 
@@ -117,6 +117,7 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
 
             if (task.isRepeating) {
                 setViewVisibility(R.id.repeat_icon, android.view.View.VISIBLE)
+                setInt(R.id.repeat_icon, "setColorFilter", textColor)
             } else {
                 setViewVisibility(R.id.repeat_icon, android.view.View.GONE)
             }
