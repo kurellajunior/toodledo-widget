@@ -8,19 +8,23 @@ Mostra le attività Toodledo in scadenza e future come widget sulla schermata.
 
 ## Descrizione lunga (max. 4000 caratteri)
 
-Un widget essenziale per la schermata iniziale di Android che mostra le tue attività in scadenza e future da Toodledo — senza fronzoli.
+Due widget essenziali per la schermata iniziale di Android — senza fronzoli.
 
-Funzionalità:
+Lista attività (ridimensionabile):
 • Attività in ritardo, di oggi e future a colpo d'occhio
 • Livelli di priorità codificati per colore (massima, alta, normale, bassa)
 • Icone per note e attività ricorrenti
 • Segna le attività come completate direttamente dal widget
 • Tocca un'attività per aprirla nell'app Toodledo o nel browser
-• Scorciatoia "Aggiungi attività" (pressione prolungata sull'icona dell'app)
 • Sincronizzazione automatica in background ogni ora
 • Aggiornamento manuale con un tocco
 • Liberamente ridimensionabile — da 1×1 a schermo intero
 • Trasparenza e dimensione del carattere regolabili
+
+Aggiungi attività (1×1):
+• Un tocco per creare una nuova attività nell'app Toodledo
+• Apre il sito web Toodledo se l'app non è installata
+
 • 12 lingue (generate automaticamente con Claude)
 
 Nota sul design:

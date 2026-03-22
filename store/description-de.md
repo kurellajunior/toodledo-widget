@@ -6,19 +6,23 @@ Zeigt fällige und kommende Toodledo-Aufgaben als Widget auf dem Startbildschirm
 
 ## Langbeschreibung (max. 4000 Zeichen)
 
-Ein schlankes Widget für den Android-Startbildschirm, das deine fälligen und kommenden Aufgaben aus Toodledo anzeigt — ohne Schnickschnack.
+Zwei schlanke Widgets für den Android-Startbildschirm — ohne Schnickschnack.
 
-Funktionen:
+Aufgabenliste (skalierbar):
 • Überfällige, heutige und kommende Aufgaben auf einen Blick
 • Farbcodierte Dringlichkeitsstufen (höchste, hoch, normal, niedrig)
 • Symbole für Notizen und wiederkehrende Aufgaben
 • Aufgaben direkt im Widget als erledigt markieren
 • Antippen öffnet die Aufgabe in der Toodledo-App oder im Browser
-• „Aufgabe hinzufügen" per Shortcut (langes Drücken auf App-Icon)
 • Automatische stündliche Synchronisation im Hintergrund
-• manuelles Aktualisieren durch Tippen möglich
+• Manuelles Aktualisieren durch Tippen möglich
 • Frei skalierbar — von 1×1 bis zum Vollbild
 • Einstellbare Transparenz und Schriftgröße
+
+Aufgabe hinzufügen (1×1):
+• Ein Tipp erstellt eine neue Aufgabe in der Toodledo-App
+• Öffnet die Toodledo-Webseite, wenn die App nicht installiert ist
+
 • 12 Sprachen (automatisch generiert mit Claude)
 
 Hinweis zum Design:

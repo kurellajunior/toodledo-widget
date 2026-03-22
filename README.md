@@ -11,16 +11,20 @@ of its respective owner.
 
 ## Features
 
+**Task List Widget** (resizable)
 - Shows overdue, due today, and upcoming tasks at a glance
 - Color-coded priority indicators
 - Note indicator for tasks with additional text
 - Repeat indicator for recurring tasks
 - Mark tasks as complete directly from the widget
 - Tap a task to open it in the Toodledo app or website
-- "Add task" shortcut (long-press on widget/app icon)
 - Pull down to refresh
 - Automatic hourly background sync
 - Configurable background color, transparency, and font size
+
+**Add Task Widget** (1x1)
+- One-tap shortcut to create a new task in the Toodledo app
+- Falls back to the Toodledo website if the app is not installed
 
 ## Supported Languages
 

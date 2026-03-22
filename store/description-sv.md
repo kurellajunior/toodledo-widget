@@ -8,19 +8,23 @@ Visar förfallna och kommande Toodledo-uppgifter som widget på hemskärmen.
 
 ## Lång beskrivning (max. 4000 tecken)
 
-En smidig widget för Android-hemskärmen som visar dina förfallna och kommande uppgifter från Toodledo — utan krusiduller.
+Två smidiga widgets för Android-hemskärmen — utan krusiduller.
 
-Funktioner:
+Uppgiftslista (skalbar):
 • Försenade, dagens och kommande uppgifter i en överblick
 • Färgkodade prioritetsnivåer (högsta, hög, normal, låg)
 • Ikoner för anteckningar och återkommande uppgifter
 • Markera uppgifter som klara direkt i widgeten
 • Tryck på en uppgift för att öppna den i Toodledo-appen eller webbläsaren
-• Genväg "Lägg till uppgift" (långtryck på appikonen)
 • Automatisk synkronisering i bakgrunden varje timme
 • Manuell uppdatering genom att trycka
 • Fritt skalbar — från 1×1 till helskärm
 • Justerbar transparens och teckenstorlek
+
+Lägg till uppgift (1×1):
+• Ett tryck för att skapa en ny uppgift i Toodledo-appen
+• Öppnar Toodledos webbplats om appen inte är installerad
+
 • 12 språk (automatiskt genererade med Claude)
 
 Designkommentar:

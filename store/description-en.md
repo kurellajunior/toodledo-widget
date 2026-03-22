@@ -6,19 +6,23 @@ Shows due and upcoming Toodledo tasks as a widget on your home screen.
 
 ## Long description (max. 4000 characters)
 
-A lean home screen widget that shows your due and upcoming tasks from Toodledo — no fluff.
+Two lean home screen widgets for Toodledo — no fluff.
 
-Features:
+Task List Widget (resizable):
 • Overdue, today, and upcoming tasks at a glance
 • Color-coded priority levels (top, high, medium, low)
 • Icons for notes and recurring tasks
 • Mark tasks as done right from the widget
 • Tap a task to open it in the Toodledo app or browser
-• "Add task" shortcut (long-press on app icon)
 • Automatic hourly background sync
 • Manual refresh by tapping
 • Freely resizable — from 1×1 to full screen
 • Adjustable transparency and font size
+
+Add Task Widget (1×1):
+• One tap to create a new task in the Toodledo app
+• Falls back to the Toodledo website if the app is not installed
+
 • 12 languages (auto-generated with Claude)
 
 A note on design:

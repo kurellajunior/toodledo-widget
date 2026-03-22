@@ -8,19 +8,23 @@ Affiche vos tâches Toodledo à venir et en retard dans un widget.
 
 ## Description longue (max. 4000 caractères)
 
-Un widget épuré pour l'écran d'accueil Android qui affiche vos tâches en cours et à venir depuis Toodledo — sans fioritures.
+Deux widgets épurés pour l'écran d'accueil Android — sans fioritures.
 
-Fonctionnalités :
+Liste de tâches (redimensionnable) :
 • Tâches en retard, du jour et à venir d'un coup d'œil
 • Niveaux de priorité codés par couleur (maximale, haute, normale, basse)
 • Icônes pour les notes et les tâches récurrentes
 • Marquer les tâches comme terminées directement depuis le widget
 • Appuyez sur une tâche pour l'ouvrir dans l'appli Toodledo ou le navigateur
-• Raccourci « Ajouter une tâche » (appui long sur l'icône de l'appli)
 • Synchronisation automatique en arrière-plan toutes les heures
 • Actualisation manuelle par simple touche
 • Librement redimensionnable — de 1×1 jusqu'au plein écran
 • Transparence et taille de police réglables
+
+Ajouter une tâche (1×1) :
+• Un seul appui pour créer une nouvelle tâche dans l'appli Toodledo
+• Ouvre le site web Toodledo si l'appli n'est pas installée
+
 • 12 langues (générées automatiquement avec Claude)
 
 Note sur le design :

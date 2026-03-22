@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Blue background with rounded corners (r=5) -->
+    <path
+        android:fillColor="#003867"
+        android:pathData="M11,6h86a5,5 0,0 1,5 5v86a5,5 0,0 1,-5 5H11a5,5 0,0 1,-5 -5V11a5,5 0,0 1,5 -5z" />
+
+    <!-- White circle (centered, r=30) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,54m-30,0a30,30 0,0 1,60 0a30,30 0,0 1,-60 0" />
+
+    <!-- Plus sign — 5 rectangles, no overlap, lighter top-left / darker bottom-right -->
+    <!-- Top arm -->
+    <path
+        android:fillColor="#FFA000"
+        android:pathData="M48,34h12v14H48z" />
+    <!-- Left arm -->
+    <path
+        android:fillColor="#F0960A"
+        android:pathData="M34,48h14v12H34z" />
+    <!-- Center -->
+    <path
+        android:fillColor="#ED9500"
+        android:pathData="M48,48h12v12H48z" />
+    <!-- Right arm -->
+    <path
+        android:fillColor="#D98600"
+        android:pathData="M60,48h14v12H60z" />
+    <!-- Bottom arm -->
+    <path
+        android:fillColor="#C87A00"
+        android:pathData="M48,60h12v14H48z" />
+</vector>

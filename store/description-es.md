@@ -8,19 +8,23 @@ Muestra tareas de Toodledo pendientes y próximas como widget en la pantalla.
 
 ## Descripción larga (máx. 4000 caracteres)
 
-Un widget ligero para la pantalla de inicio de Android que muestra tus tareas pendientes y próximas de Toodledo — sin adornos.
+Dos widgets ligeros para la pantalla de inicio de Android — sin adornos.
 
-Funciones:
+Lista de tareas (redimensionable):
 • Tareas atrasadas, de hoy y próximas de un vistazo
 • Niveles de prioridad codificados por color (máxima, alta, normal, baja)
 • Iconos para notas y tareas recurrentes
 • Marca tareas como completadas directamente desde el widget
 • Toca una tarea para abrirla en la app de Toodledo o en el navegador
-• Atajo "Añadir tarea" (mantener pulsado el icono de la app)
 • Sincronización automática en segundo plano cada hora
 • Actualización manual tocando
 • Tamaño libremente ajustable — de 1×1 a pantalla completa
 • Transparencia y tamaño de fuente configurables
+
+Añadir tarea (1×1):
+• Un toque para crear una nueva tarea en la app de Toodledo
+• Abre el sitio web de Toodledo si la app no está instalada
+
 • 12 idiomas (generados automáticamente con Claude)
 
 Nota sobre el diseño:

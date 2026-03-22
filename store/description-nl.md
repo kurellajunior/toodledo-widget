@@ -8,19 +8,23 @@ Toont openstaande en komende Toodledo-taken als widget op je startscherm.
 
 ## Lange beschrijving (max. 4000 tekens)
 
-Een slank widget voor het Android-startscherm dat je openstaande en komende taken uit Toodledo toont — zonder poespas.
+Twee slanke widgets voor het Android-startscherm — zonder poespas.
 
-Functies:
+Takenlijst (schaalbaar):
 • Achterstallige, vandaag en komende taken in één oogopslag
 • Kleurgecodeerde prioriteitsniveaus (hoogste, hoog, normaal, laag)
 • Iconen voor notities en herhalende taken
 • Taken direct in het widget als voltooid markeren
 • Tik op een taak om deze te openen in de Toodledo-app of browser
-• "Taak toevoegen" snelkoppeling (lang drukken op app-icoon)
 • Automatische synchronisatie op de achtergrond elk uur
 • Handmatig verversen door tikken
 • Vrij schaalbaar — van 1×1 tot volledig scherm
 • Instelbare transparantie en lettergrootte
+
+Taak toevoegen (1×1):
+• Eén tik om een nieuwe taak aan te maken in de Toodledo-app
+• Opent de Toodledo-website als de app niet is geïnstalleerd
+
 • 12 talen (automatisch gegenereerd met Claude)
 
 Opmerking over het ontwerp:
