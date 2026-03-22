@@ -45,8 +45,8 @@ sehen. Farbschema:
   der Zeilenhöhe.
 - Das Widget wird vollständig ausgefüllt. Ein sehr dünner, kontrastreicher
   Rahmen drumherum.
-- die erste Zeile kann für Statusinformationen des Widgets benutzt werden
-  (ohne Quadrat vorne)
+- Statusinformationen (Login-Prompt, Fehler) werden als erstes Listenelement
+  angezeigt, gestylt wie Sektions-Header (grau, zentriert, klickbar)
 - Widget soll rezisable sein. Defaultgröße 1 hoch, 4 breit. Nur eine
   Widgetinstanz vorgesehen. Der Nutzer kann es auf die gewünschte Größe
   ziehen. Designidee ist, dass nur die nächsten 3-5 Tasks sichtbar sind, da
@@ -56,24 +56,23 @@ sehen. Farbschema:
 
 - Wenn der Nutzer nicht eingeloggt ist oder der Login abgelaufen ist: zeige
   entsprechende Meldung als erste Zeile an.
-  - beim Tip auf diese Meldung kann der Nutzer sich anmelden und danach wird
-    die Liste vom Server aktualisiert
+  - beim Tip auf diese Meldung öffnet sich die Einstellungsseite zum Anmelden
 - Swipe: Nach oben und nach unten wischen scrollt durch die Liste, wenn das
   Widget nicht alle Aufgaben anzeigen kann
 - Nach unten swipen über das Ende hinaus löst eine Aktualisierung vom Server
-  aus
+  aus (Refresh-Zeile am Listenende)
 - Tippen auf das Quadrat links markiert die Aufgabe als jetzt erledigt auf dem
-  Server und aktualisiert danach die Liste. Wenn kein Zugang zur API (offline)
-  oder Fehler eine entsprechende Meldung als erste Zeile anzeigen
+  Server und aktualisiert danach die Liste.
 - Tippen auf die Aufgabe sonst öffnet die Aufgabe in Toodledo, wenn
   installiert, sonst im Browser auf toodledo
-- long press auf das Widget öffnet das Systemseitige widgetmenü mit
-  Zusatzoptionen:
-  - die Einstellungsseite für dieses Widget
-  - Hinzufügen einer Aufgabe (Sprung zu App oder Webseite)
-
+- long press auf das Widget öffnet das Systemseitige Widgetmenü mit der
+  Einstellungsseite
+- Fehlerverhalten: Bei Netzwerk- oder API-Fehlern wird die bisherige
+  Aufgabenliste beibehalten. Der Fehlerstatus wird als erstes Listenelement
+  angezeigt (Tap löst erneuten Fetch aus). Beim allerersten Fehler nach
+  Install ist die Liste leer.
 - Die Liste sollte sich automatisch im Hintergrund aktualisieren. Stromsparend
-  sollte alle Stunde reichen.
+  sollte alle Stunde reichen (WorkManager).
 
 - Keine Benachrichtigungen, keine Sonderrechte.
 
@@ -83,7 +82,11 @@ sehen. Farbschema:
   durchsichtig)
 - Die Schriftgröße relativ zur Systemgröße (in %, Standard ist 100%)
 - Die Hintergrundfarbe (standard sollte vom aktuellen Theme genommen werden)
-- logout / login
+- Login / Logout Button
+- Schließen-Button (schließt die Einstellungsseite)
+- Dynamische Button-Hervorhebung: Anmelden ist CTA wenn abgemeldet,
+  Schließen ist CTA wenn angemeldet (über Alpha-Werte)
+- Spendenhinweis mit PayPal-Link am unteren Rand
 
 ## Sprachen
 
@@ -107,20 +110,32 @@ Der Eintrag im Playstore soll Englisch sein.
     begind and due date, repeat, note. Keine completed laden/zeigen. Repeat
     nur für die Anzeige des Kreispfeils. Note nur für die Anzeige des
     Dokument-Symbols (ob vorhanden, nicht der Inhalt).
-  - API-Key Handling: Client ID und Client Secret werden nicht im Repo                                                                              
-    gespeichert. Sie werden über `local.properties` (gitignored) eingetragen                                                                        
-    und zur Build-Zeit als BuildConfig-Felder injiziert. OAuth-Tokens des                                                                           
-    Nutzers werden in EncryptedSharedPreferences gespeichert.                                                                                       
-    Hinweis: In der kompilierten APK sind Client ID/Secret prinzipiell                                                                              
-    extrahierbar — ein Backend-Proxy wäre sicherer, ist aber für dieses                                                                             
-    Projekt unverhältnismäßig. Bei Missbrauch kann der Key bei Toodledo                                                                             
-    revoked werden.   
-2. Tech-Stack
-  - Kompatibilität: Testgerät hat Android 15. Ideal bis Android 11. Maximal
-    back bis Android 8. Trade-off zw. Features und Kompatibilität treffen.
+  - API-Key Handling: Client ID und Client Secret werden nicht im Repo
+    gespeichert. Sie werden über `local.properties` (gitignored) eingetragen
+    und zur Build-Zeit als BuildConfig-Felder injiziert. OAuth-Tokens des
+    Nutzers werden in EncryptedSharedPreferences gespeichert.
+    Hinweis: In der kompilierten APK sind Client ID/Secret prinzipiell
+    extrahierbar — ein Backend-Proxy wäre sicherer, ist aber für dieses
+    Projekt unverhältnismäßig. Bei Missbrauch kann der Key bei Toodledo
+    revoked werden.
+  - `FetchResult` sealed interface: typisiertes Ergebnis von `fetchTasks()`
+    mit den Varianten `Success(tasks)`, `AuthError`, `NetworkError`, `ApiError`.
+2. Widget-Status
+  - `WidgetStatus` Enum als Single Source of Truth (in SharedPreferences):
+    INITIAL, LOADED, OFFLINE, API_ERROR, LOGGED_OUT
+  - Die Factory setzt den Status nach jedem Fetch und erzeugt bei Nicht-LOADED
+    ein `StatusItem` als erstes Listenelement.
+  - Statusanzeige ist ein reguläres ListView-Item (kein separates View außerhalb
+    der Liste). Dadurch keine Race Conditions zwischen `updateAppWidget` und
+    `partiallyUpdateAppWidget` — insbesondere relevant für Android 16, wo
+    `updateAppWidget` mit `setRemoteAdapter` die ListView zurücksetzt.
+  - Bei Fehler-Status bleibt die bisherige Aufgabenliste erhalten.
+3. Tech-Stack
+  - Kompatibilität: Testgerät hat Android 16 (Fairphone 6). Getestet auf
+    API 36 Emulator. Ideal bis Android 11. Maximal back bis Android 8.
   - Verwende möglichst verbreitet Standard-Technologien.
-3. Offline/Cache
-  - erstmal kein lokaler Speicher. Widget zeigt einen Text an, wenn noch keine
+4. Offline/Cache
+  - Kein lokaler Speicher. Widget zeigt StatusItem an, wenn noch keine
     Daten geladen wurden/werden konnten
 
 ## Lizenz
@@ -179,7 +194,7 @@ Bereite die Veröffentlichung im Playstore vor.
 
 Information im PlayStore, kann noch sinnvoll ergänzt werden mit tatsächlichen
 Features und Einstellmöglichkeiten:
-  
+
   This is a simple Widget to show the current and upcoming tasks from Toodledo.
 
   It is a private project, meant to be simple and useful. It fetches your
@@ -196,4 +211,19 @@ Features und Einstellmöglichkeiten:
 
 Dokumentiere, was ich tun muss, um im Playstore zu publishen, erstelle
 notwendige Scripte, um den Prozess in der Zukunft einfach zu gestalten.
+
+### Erledigt in Phase 3
+
+- Play Store Listings in 12 Sprachen erstellt
+- Status State Machine (5 Zustände) mit typisiertem FetchResult
+- Statusanzeige als ListView-Item (statt separatem View) — behebt
+  RemoteViews-Race-Condition auf Android 16
+- Shortcut „Aufgabe hinzufügen" entfernt (AddTaskActivity, shortcuts.xml,
+  ic_add_task.xml). Wird durch ein separates 1x1 Add-Task Widget ersetzt.
+- Settings: Schließen-Button, dynamische CTA-Hervorhebung, Spendenhinweis
+- Projektplan aktualisiert
+
+### Offen
+
+- 1x1 Add-Task Widget (Icon-Design-Phase, dann Implementierung)
 
