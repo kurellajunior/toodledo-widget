@@ -30,14 +30,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Add task trampoline (app shortcut target) -->
-        <activity
-            android:name=".AddTaskActivity"
-            android:exported="true"
-            android:excludeFromRecents="true"
-            android:theme="@android:style/Theme.NoDisplay" />
-
-        <!-- Widget settings (also serves as launcher entry for app shortcuts) -->
+        <!-- Widget settings (launcher entry) -->
         <activity
             android:name=".SettingsActivity"
             android:exported="true"
@@ -46,9 +39,6 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
         </activity>
 
         <!-- Widget provider -->
