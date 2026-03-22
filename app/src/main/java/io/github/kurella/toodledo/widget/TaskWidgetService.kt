@@ -55,9 +55,8 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
         val tokenStore = TokenStore(context)
         if (!tokenStore.isLoggedIn) {
             Log.d(TAG, "loadTasks: not logged in")
-            items = emptyList()
+            items = listOf(statusItem(WidgetStatus.INITIAL))
             writeStatus(prefs, WidgetStatus.INITIAL)
-            TaskWidgetProvider.updateStatusLine(context)
             return
         }
 
@@ -74,23 +73,32 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
                 Log.d(TAG, "loadTasks: ${result.tasks.size} tasks → ${items.size} items")
             }
             is FetchResult.AuthError -> {
+                items = listOf(statusItem(WidgetStatus.LOGGED_OUT))
                 writeStatus(prefs, WidgetStatus.LOGGED_OUT)
                 Log.w(TAG, "loadTasks: auth error")
             }
             is FetchResult.NetworkError -> {
+                items = listOf(statusItem(WidgetStatus.OFFLINE))
                 writeStatus(prefs, WidgetStatus.OFFLINE)
                 Log.w(TAG, "loadTasks: network error")
             }
             is FetchResult.ApiError -> {
+                items = listOf(statusItem(WidgetStatus.API_ERROR))
                 writeStatus(prefs, WidgetStatus.API_ERROR)
                 Log.w(TAG, "loadTasks: API error")
             }
         }
-        // The Factory calls back into the Provider here — a layer inversion (adapter → controller).
-        // This is intentional: onDataSetChanged is async, so the caller of notifyAppWidgetViewDataChanged
-        // cannot know when the new status is available. Only the Factory knows, making this the only
-        // reliable place to trigger the status line update.
-        TaskWidgetProvider.updateStatusLine(context)
+    }
+
+    private fun statusItem(status: WidgetStatus): ListItem.StatusItem {
+        val (textRes, action) = when (status) {
+            WidgetStatus.INITIAL -> R.string.not_logged_in to "settings"
+            WidgetStatus.LOGGED_OUT -> R.string.error_auth to "settings"
+            WidgetStatus.OFFLINE -> R.string.error_offline to "refresh"
+            WidgetStatus.API_ERROR -> R.string.error_api to "refresh"
+            WidgetStatus.LOADED -> error("unreachable")
+        }
+        return ListItem.StatusItem(textRes, action)
     }
 
     override fun getCount(): Int = items.size
@@ -102,6 +110,7 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
             is ListItem.TaskItem -> buildTaskView(item.task)
             is ListItem.RefreshItem -> buildRefreshView()
             is ListItem.EmptyItem -> buildEmptyView()
+            is ListItem.StatusItem -> buildStatusView(item)
         }
     }
 
@@ -169,6 +178,19 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
             setTextColor(R.id.section_title, sectionTextColor)
             setOnClickFillInIntent(R.id.section_title, Intent().apply {
                 putExtra("action", "refresh")
+            })
+        }
+    }
+
+    private fun buildStatusView(item: ListItem.StatusItem): RemoteViews {
+        return RemoteViews(context.packageName, R.layout.widget_section_header).apply {
+            setTextViewText(R.id.section_title, context.getString(item.textRes))
+            setTextViewTextSize(R.id.section_title, TypedValue.COMPLEX_UNIT_SP, BASE_SECTION_SP * fontScale)
+            setInt(R.id.section_title, "setGravity", Gravity.CENTER)
+            setInt(R.id.section_title, "setBackgroundColor", sectionBackground)
+            setTextColor(R.id.section_title, sectionTextColor)
+            setOnClickFillInIntent(R.id.section_title, Intent().apply {
+                putExtra("action", item.action)
             })
         }
     }

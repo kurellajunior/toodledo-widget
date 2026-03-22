@@ -11,7 +11,6 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
 import io.github.kurella.toodledo.widget.R
@@ -73,29 +72,11 @@ class TaskWidgetProvider : AppWidgetProvider() {
             }
         }
 
-        /** Rebuild widget layout with current status, without triggering adapter reload. */
-        fun updateStatusLine(context: Context) {
-            val (manager, ids) = widgetIds(context)
-            if (ids.isEmpty()) return
-            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            val status = readStatus(prefs)
-            Log.d(TAG, "updateStatusLine: $status")
-            for (widgetId in ids) {
-                manager.updateAppWidget(widgetId,
-                    buildViews(context, widgetId, status))
-            }
-        }
-
-        private fun buildViews(
-            context: Context, widgetId: Int, status: WidgetStatus
-        ): RemoteViews {
+        private fun buildViews(context: Context, widgetId: Int): RemoteViews {
             val bgColor = resolveBackgroundColor(context)
-            val textColor = textColor(context)
 
             return RemoteViews(context.packageName, R.layout.widget_task_list).apply {
                 setInt(R.id.widget_background, "setBackgroundColor", bgColor)
-                setTextColor(R.id.status_line, textColor)
-                applyStatus(context, this, status)
 
                 val serviceIntent = Intent(context, TaskWidgetService::class.java).apply {
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
@@ -115,39 +96,6 @@ class TaskWidgetProvider : AppWidgetProvider() {
                 setPendingIntentTemplate(R.id.task_list, clickPending)
             }
         }
-
-        private fun applyStatus(context: Context, views: RemoteViews, status: WidgetStatus) {
-            if (status == WidgetStatus.LOADED) {
-                views.setViewVisibility(R.id.status_line, View.GONE)
-            } else {
-                val (textRes, pending) = when (status) {
-                    WidgetStatus.INITIAL -> R.string.not_logged_in to settingsPendingIntent(context)
-                    WidgetStatus.LOGGED_OUT -> R.string.error_auth to settingsPendingIntent(context)
-                    WidgetStatus.OFFLINE -> R.string.error_offline to refreshPendingIntent(context)
-                    WidgetStatus.API_ERROR -> R.string.error_api to refreshPendingIntent(context)
-                    WidgetStatus.LOADED -> error("unreachable")
-                }
-                views.setViewVisibility(R.id.status_line, View.VISIBLE)
-                views.setTextViewText(R.id.status_line, context.getString(textRes))
-                views.setInt(R.id.status_line, "setBackgroundColor", sectionColor(context))
-                views.setTextColor(R.id.status_line, 0xFFFFFFFF.toInt())
-                views.setOnClickPendingIntent(R.id.status_line, pending)
-            }
-        }
-
-        private fun settingsPendingIntent(context: Context): PendingIntent =
-            PendingIntent.getActivity(
-                context, 0,
-                Intent(context, SettingsActivity::class.java),
-                PendingIntent.FLAG_IMMUTABLE
-            )
-
-        private fun refreshPendingIntent(context: Context): PendingIntent =
-            PendingIntent.getBroadcast(
-                context, 1,
-                Intent(context, TaskWidgetProvider::class.java).apply { action = ACTION_REFRESH },
-                PendingIntent.FLAG_IMMUTABLE
-            )
 
         /** Layout-only update (background color) without rebinding adapter. */
         fun updateLayout(context: Context) {
@@ -197,11 +145,8 @@ class TaskWidgetProvider : AppWidgetProvider() {
         context: Context, manager: AppWidgetManager, widgetIds: IntArray
     ) {
         Log.d(TAG, "onUpdate: ${widgetIds.size} widgets")
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val status = readStatus(prefs)
-
         for (widgetId in widgetIds) {
-            manager.updateAppWidget(widgetId, buildViews(context, widgetId, status))
+            manager.updateAppWidget(widgetId, buildViews(context, widgetId))
         }
 
         @Suppress("DEPRECATION")
@@ -236,6 +181,11 @@ class TaskWidgetProvider : AppWidgetProvider() {
                 }
             }
             "open" -> openToodledo(context)
+            "settings" -> context.startActivity(
+                Intent(context, SettingsActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+            )
             "refresh" -> {
                 Log.d(TAG, "Refresh from list item")
                 fullUpdate(context)

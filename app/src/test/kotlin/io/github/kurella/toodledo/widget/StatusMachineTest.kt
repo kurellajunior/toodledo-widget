@@ -86,25 +86,18 @@ class StatusMachineTest {
         }
 
         @Test
-        fun `Factory calls updateStatusLine after loadTasks`() {
-            assertTrue(factorySource.contains("updateStatusLine"),
-                "Factory must call TaskWidgetProvider.updateStatusLine()")
-        }
-
-        @Test
-        fun `Provider reads WidgetStatus in updateStatusLine`() {
-            assertTrue(providerSource.contains("fun updateStatusLine"),
-                "Provider must define updateStatusLine()")
-            assertTrue(providerSource.contains("readStatus("),
-                "Provider.updateStatusLine must call readStatus()")
-        }
-
-        @Test
-        fun `Provider handles all WidgetStatus values`() {
+        fun `Factory creates StatusItem for all non-LOADED states`() {
+            // statusItem() must reference all non-LOADED WidgetStatus values
             for (status in WidgetStatus.entries) {
-                assertTrue(providerSource.contains("WidgetStatus.${status.name}"),
-                    "Provider must handle WidgetStatus.${status.name}")
+                assertTrue(factorySource.contains("WidgetStatus.${status.name}"),
+                    "Factory must reference WidgetStatus.${status.name}")
             }
+        }
+
+        @Test
+        fun `Factory builds StatusItem in getViewAt`() {
+            assertTrue(factorySource.contains("is ListItem.StatusItem"),
+                "Factory getViewAt must handle ListItem.StatusItem")
         }
 
         @Test
@@ -128,9 +121,9 @@ class StatusMachineTest {
 
             val onUpdateBody = body.toString()
             assertTrue(!onUpdateBody.contains("not_logged_in"),
-                "onUpdate must not contain not_logged_in logic — status is handled by updateStatusLine()")
+                "onUpdate must not contain not_logged_in logic — status is handled by Factory")
             assertTrue(!onUpdateBody.contains("isLoggedIn"),
-                "onUpdate must not check isLoggedIn — status is handled by updateStatusLine()")
+                "onUpdate must not check isLoggedIn — status is handled by Factory")
         }
     }
 }

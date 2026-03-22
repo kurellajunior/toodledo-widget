@@ -13,17 +13,7 @@
         android:orientation="vertical"
         android:background="@drawable/widget_background">
 
-        <!-- Status line (login prompt, errors) — styled like section headers -->
-        <TextView
-            android:id="@+id/status_line"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="4dp"
-            android:textSize="11sp"
-            android:visibility="gone" />
-
-        <!-- Task list -->
+        <!-- Task list (status banners are StatusItem entries managed by the Factory) -->
         <ListView
             android:id="@+id/task_list"
             android:layout_width="match_parent"

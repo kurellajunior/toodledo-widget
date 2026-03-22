@@ -11,6 +11,8 @@ sealed class ListItem {
     data class TaskItem(val task: Task) : ListItem()
     data object RefreshItem : ListItem()
     data object EmptyItem : ListItem()
+    /** Status banner (errors, login prompt). Tap action depends on status. */
+    data class StatusItem(val textRes: Int, val action: String) : ListItem()
 }
 
 object TaskSorter {
