@@ -82,5 +82,16 @@
             android:layout_marginTop="8dp"
             android:text="@string/login" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:autoLink="web"
+            android:text="@string/donate_hint" />
+
     </LinearLayout>
 </ScrollView>

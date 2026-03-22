@@ -20,4 +20,5 @@
     <string name="login_hint">登录 Toodledo 帐户以显示您的任务。</string>
     <string name="logout_hint">您已登录。您的任务显示在小部件上。</string>
     <string name="add_task">添加任务</string>
+    <string name="donate_hint">如果您喜欢这个小部件，欢迎请我喝杯虚拟咖啡 ☕\n\npaypal.me/JanKurella</string>
 </resources>

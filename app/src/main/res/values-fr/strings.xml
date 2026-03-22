@@ -20,4 +20,5 @@
     <string name="login_hint">Connectez-vous à Toodledo pour afficher vos tâches.</string>
     <string name="logout_hint">Vous êtes connecté. Vos tâches sont affichées sur le widget.</string>
     <string name="add_task">Ajouter une tâche</string>
+    <string name="donate_hint">Si ce widget vous plaît, vous pouvez m\'offrir un café virtuel ☕\n\npaypal.me/JanKurella</string>
 </resources>

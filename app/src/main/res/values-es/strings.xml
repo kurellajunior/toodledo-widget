@@ -20,4 +20,5 @@
     <string name="login_hint">Inicia sesión en Toodledo para mostrar tus tareas.</string>
     <string name="logout_hint">Has iniciado sesión. Tus tareas se muestran en el widget.</string>
     <string name="add_task">Añadir tarea</string>
+    <string name="donate_hint">Si te gusta este widget, me encantaría que me invitaras a un café virtual ☕\n\npaypal.me/JanKurella</string>
 </resources>
