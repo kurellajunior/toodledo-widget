@@ -1,10 +1,11 @@
 <resources>
     <string name="widget_name">Uppgifter</string>
     <string name="settings_title">Toodledo Widgetinställningar</string>
-    <string name="not_logged_in">Tryck för att logga in på Toodledo</string>
+    <string name="not_logged_in">Tryck för att logga in</string>
     <string name="no_tasks">Inga uppgifter att göra</string>
-    <string name="error_offline">Offline – tryck för att försöka igen</string>
-    <string name="error_auth">Sessionen har gått ut – tryck för att logga in</string>
+    <string name="error_offline">↻ Offline – tryck för att ladda</string>
+    <string name="error_api">↻ Fel vid laddning – tryck för att försöka igen</string>
+    <string name="error_auth">Inloggningen har gått ut – tryck för att logga in</string>
     <string name="section_overdue">Försenad</string>
     <string name="section_today">Idag</string>
     <string name="section_tomorrow">Imorgon</string>

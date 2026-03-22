@@ -1,10 +1,11 @@
 <resources>
     <string name="widget_name">Задачи</string>
     <string name="settings_title">Toodledo – Настройки виджета</string>
-    <string name="not_logged_in">Нажмите, чтобы войти в Toodledo</string>
+    <string name="not_logged_in">Нажмите для входа</string>
     <string name="no_tasks">Нет запланированных задач</string>
-    <string name="error_offline">Нет сети – нажмите для повтора</string>
-    <string name="error_auth">Сеанс истёк – нажмите для входа</string>
+    <string name="error_offline">↻ Нет сети – нажмите для загрузки</string>
+    <string name="error_api">↻ Ошибка загрузки – нажмите для повтора</string>
+    <string name="error_auth">Сессия истекла – нажмите для входа</string>
     <string name="section_overdue">Просрочено</string>
     <string name="section_today">Сегодня</string>
     <string name="section_tomorrow">Завтра</string>

@@ -10,6 +10,7 @@ sealed class ListItem {
     data class SectionHeader(val title: String) : ListItem()
     data class TaskItem(val task: Task) : ListItem()
     data object RefreshItem : ListItem()
+    data object EmptyItem : ListItem()
 }
 
 object TaskSorter {

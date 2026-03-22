@@ -49,32 +49,51 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
     }
 
     private fun loadTasks() {
-        try {
-            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            fontScale = prefs.getInt(PREF_FONT_SIZE, DEFAULT_FONT_SIZE) / 100f
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        fontScale = prefs.getInt(PREF_FONT_SIZE, DEFAULT_FONT_SIZE) / 100f
+        textColor = TaskWidgetProvider.textColor(context)
+        sectionTextColor = SECTION_TEXT_COLOR
+        sectionBackground = TaskWidgetProvider.sectionColor(context)
 
-            textColor = TaskWidgetProvider.textColor(context)
-            sectionTextColor = SECTION_TEXT_COLOR
-
-            sectionBackground = TaskWidgetProvider.sectionColor(context)
-
-            val tokenStore = TokenStore(context)
-            if (!tokenStore.isLoggedIn) {
-                Log.d(TAG, "loadTasks: not logged in")
-                items = emptyList()
-                return
-            }
-            val api = ToodledoApi(tokenStore)
-            val tasks = api.fetchTasks()
-            if (tasks == null) {
-                Log.w(TAG, "loadTasks: fetchTasks returned null (token or network error)")
-                return
-            }
-            items = TaskSorter.buildList(tasks, context) + ListItem.RefreshItem
-            Log.d(TAG, "loadTasks: ${tasks.size} tasks → ${items.size} items")
-        } catch (e: Exception) {
-            Log.e(TAG, "loadTasks failed", e)
+        val tokenStore = TokenStore(context)
+        if (!tokenStore.isLoggedIn) {
+            Log.d(TAG, "loadTasks: not logged in")
+            items = emptyList()
+            writeStatus(prefs, WidgetStatus.INITIAL)
+            TaskWidgetProvider.updateStatusLine(context)
+            return
         }
+
+        val api = ToodledoApi(tokenStore)
+        when (val result = api.fetchTasks()) {
+            is FetchResult.Success -> {
+                val taskItems = TaskSorter.buildList(result.tasks, context)
+                items = if (taskItems.isEmpty()) {
+                    listOf(ListItem.EmptyItem, ListItem.RefreshItem)
+                } else {
+                    taskItems + ListItem.RefreshItem
+                }
+                writeStatus(prefs, WidgetStatus.LOADED)
+                Log.d(TAG, "loadTasks: ${result.tasks.size} tasks → ${items.size} items")
+            }
+            is FetchResult.AuthError -> {
+                writeStatus(prefs, WidgetStatus.LOGGED_OUT)
+                Log.w(TAG, "loadTasks: auth error")
+            }
+            is FetchResult.NetworkError -> {
+                writeStatus(prefs, WidgetStatus.OFFLINE)
+                Log.w(TAG, "loadTasks: network error")
+            }
+            is FetchResult.ApiError -> {
+                writeStatus(prefs, WidgetStatus.API_ERROR)
+                Log.w(TAG, "loadTasks: API error")
+            }
+        }
+        TaskWidgetProvider.updateStatusLine(context)
+    }
+
+    private fun writeStatus(prefs: android.content.SharedPreferences, status: WidgetStatus) {
+        prefs.edit().putString(PREF_WIDGET_STATUS, status.name).apply()
     }
 
     override fun getCount(): Int = items.size
@@ -85,6 +104,7 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
             is ListItem.SectionHeader -> buildSectionView(item)
             is ListItem.TaskItem -> buildTaskView(item.task)
             is ListItem.RefreshItem -> buildRefreshView()
+            is ListItem.EmptyItem -> buildEmptyView()
         }
     }
 
@@ -153,6 +173,16 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
             setOnClickFillInIntent(R.id.section_title, Intent().apply {
                 putExtra("action", "refresh")
             })
+        }
+    }
+
+    private fun buildEmptyView(): RemoteViews {
+        return RemoteViews(context.packageName, R.layout.widget_section_header).apply {
+            setTextViewText(R.id.section_title, context.getString(R.string.no_tasks))
+            setTextViewTextSize(R.id.section_title, TypedValue.COMPLEX_UNIT_SP, BASE_TEXT_SP * fontScale)
+            setInt(R.id.section_title, "setGravity", Gravity.CENTER)
+            setInt(R.id.section_title, "setBackgroundColor", TRANSPARENT)
+            setTextColor(R.id.section_title, textColor)
         }
     }
 

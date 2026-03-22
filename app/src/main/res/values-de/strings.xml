@@ -1,10 +1,11 @@
 <resources>
     <string name="widget_name">Aufgaben</string>
     <string name="settings_title">Toodledo Widget-Einstellungen</string>
-    <string name="not_logged_in">Tippen, um sich bei Toodledo anzumelden</string>
+    <string name="not_logged_in">Zum Anmelden tippen</string>
     <string name="no_tasks">Keine fälligen Aufgaben</string>
-    <string name="error_offline">Offline – tippen zum Wiederholen</string>
-    <string name="error_auth">Login abgelaufen – tippen zum Anmelden</string>
+    <string name="error_offline">↻ Offline – zum Laden tippen</string>
+    <string name="error_api">↻ Fehler beim Laden – zum Wiederholen tippen</string>
+    <string name="error_auth">Login abgelaufen – zum Anmelden tippen</string>
     <string name="section_overdue">Überfällig</string>
     <string name="section_today">Heute</string>
     <string name="section_tomorrow">Morgen</string>

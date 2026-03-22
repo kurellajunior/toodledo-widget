@@ -74,6 +74,88 @@ class TaskWidgetProvider : AppWidgetProvider() {
             }
         }
 
+        /** Rebuild widget layout with current status, without triggering adapter reload. */
+        fun updateStatusLine(context: Context) {
+            val (manager, ids) = widgetIds(context)
+            if (ids.isEmpty()) return
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val status = readStatus(prefs)
+            Log.d(TAG, "updateStatusLine: $status")
+            for (widgetId in ids) {
+                manager.updateAppWidget(widgetId,
+                    buildViews(context, widgetId, status))
+            }
+        }
+
+        private fun buildViews(
+            context: Context, widgetId: Int, status: WidgetStatus
+        ): RemoteViews {
+            val bgColor = resolveBackgroundColor(context)
+            val textColor = textColor(context)
+
+            return RemoteViews(context.packageName, R.layout.widget_task_list).apply {
+                setInt(R.id.widget_background, "setBackgroundColor", bgColor)
+                setTextColor(R.id.status_line, textColor)
+                applyStatus(context, this, status)
+
+                val serviceIntent = Intent(context, TaskWidgetService::class.java).apply {
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                    data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+                }
+                // TODO migrate to RemoteCollectionItems when minSdk >= 31 (API 35 replacement)
+                @Suppress("DEPRECATION")
+                setRemoteAdapter(R.id.task_list, serviceIntent)
+                setScrollPosition(R.id.task_list, 0)
+
+                val clickIntent = Intent(context, TaskWidgetProvider::class.java).apply {
+                    action = "item_click"
+                }
+                val clickPending = PendingIntent.getBroadcast(
+                    context, 0, clickIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                )
+                setPendingIntentTemplate(R.id.task_list, clickPending)
+            }
+        }
+
+        private fun readStatus(prefs: android.content.SharedPreferences): WidgetStatus = try {
+            WidgetStatus.valueOf(prefs.getString(PREF_WIDGET_STATUS, null) ?: WidgetStatus.INITIAL.name)
+        } catch (_: IllegalArgumentException) {
+            WidgetStatus.INITIAL
+        }
+
+        private fun applyStatus(context: Context, views: RemoteViews, status: WidgetStatus) {
+            if (status == WidgetStatus.LOADED) {
+                views.setViewVisibility(R.id.status_line, View.GONE)
+            } else {
+                val (textRes, pending) = when (status) {
+                    WidgetStatus.LOGGED_OUT -> R.string.error_auth to settingsPendingIntent(context)
+                    WidgetStatus.OFFLINE -> R.string.error_offline to refreshPendingIntent(context)
+                    WidgetStatus.API_ERROR -> R.string.error_api to refreshPendingIntent(context)
+                    else -> R.string.not_logged_in to settingsPendingIntent(context)
+                }
+                views.setViewVisibility(R.id.status_line, View.VISIBLE)
+                views.setTextViewText(R.id.status_line, context.getString(textRes))
+                views.setInt(R.id.status_line, "setBackgroundColor", sectionColor(context))
+                views.setTextColor(R.id.status_line, 0xFFFFFFFF.toInt())
+                views.setOnClickPendingIntent(R.id.status_line, pending)
+            }
+        }
+
+        private fun settingsPendingIntent(context: Context): PendingIntent =
+            PendingIntent.getActivity(
+                context, 0,
+                Intent(context, SettingsActivity::class.java),
+                PendingIntent.FLAG_IMMUTABLE
+            )
+
+        private fun refreshPendingIntent(context: Context): PendingIntent =
+            PendingIntent.getBroadcast(
+                context, 1,
+                Intent(context, TaskWidgetProvider::class.java).apply { action = ACTION_REFRESH },
+                PendingIntent.FLAG_IMMUTABLE
+            )
+
         /** Layout-only update (background color) without rebinding adapter. */
         fun updateLayout(context: Context) {
             val (manager, ids) = widgetIds(context)
@@ -122,61 +204,11 @@ class TaskWidgetProvider : AppWidgetProvider() {
         context: Context, manager: AppWidgetManager, widgetIds: IntArray
     ) {
         Log.d(TAG, "onUpdate: ${widgetIds.size} widgets")
-        val tokenStore = TokenStore(context)
-        val bgColor = resolveBackgroundColor(context)
-        val textColor = textColor(context)
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val status = readStatus(prefs)
 
         for (widgetId in widgetIds) {
-            val views = RemoteViews(context.packageName, R.layout.widget_task_list)
-            views.setInt(R.id.widget_background, "setBackgroundColor", bgColor)
-            views.setTextColor(R.id.status_line, textColor)
-            views.setTextColor(R.id.empty_view, textColor)
-
-            if (!tokenStore.isLoggedIn) {
-                views.setViewVisibility(R.id.status_line, View.VISIBLE)
-                views.setTextViewText(R.id.status_line,
-                    context.getString(R.string.not_logged_in))
-
-                val loginIntent = Intent(context, OAuthCallbackActivity::class.java).apply {
-                    action = "login"
-                }
-                val loginPending = PendingIntent.getActivity(
-                    context, 0, loginIntent, PendingIntent.FLAG_IMMUTABLE
-                )
-                views.setOnClickPendingIntent(R.id.status_line, loginPending)
-            } else {
-                views.setViewVisibility(R.id.status_line, View.GONE)
-            }
-
-            val serviceIntent = Intent(context, TaskWidgetService::class.java).apply {
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-                data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
-            }
-            // TODO migrate to RemoteCollectionItems when minSdk >= 31 (API 35 replacement)
-            @Suppress("DEPRECATION")
-            views.setRemoteAdapter(R.id.task_list, serviceIntent)
-            views.setScrollPosition(R.id.task_list, 0)
-            views.setEmptyView(R.id.task_list, R.id.empty_view)
-
-            val clickIntent = Intent(context, TaskWidgetProvider::class.java).apply {
-                action = "item_click"
-            }
-            val clickPending = PendingIntent.getBroadcast(
-                context, 0, clickIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-            )
-            views.setPendingIntentTemplate(R.id.task_list, clickPending)
-
-            // Tap on empty view → refresh
-            val refreshIntent = Intent(context, TaskWidgetProvider::class.java).apply {
-                action = ACTION_REFRESH
-            }
-            val refreshPending = PendingIntent.getBroadcast(
-                context, 1, refreshIntent, PendingIntent.FLAG_IMMUTABLE
-            )
-            views.setOnClickPendingIntent(R.id.empty_view, refreshPending)
-
-            manager.updateAppWidget(widgetId, views)
+            manager.updateAppWidget(widgetId, buildViews(context, widgetId, status))
         }
 
         // TODO migrate to RemoteCollectionItems when minSdk >= 31 (API 35 replacement)
@@ -220,7 +252,7 @@ class TaskWidgetProvider : AppWidgetProvider() {
 
         if (intent.action == ACTION_REFRESH) {
             Log.d(TAG, "ACTION_REFRESH received")
-            refresh(context)
+            fullUpdate(context)
         }
     }
 

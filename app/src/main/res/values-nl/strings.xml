@@ -1,10 +1,11 @@
 <resources>
     <string name="widget_name">Taken</string>
     <string name="settings_title">Toodledo Widget-instellingen</string>
-    <string name="not_logged_in">Tik om in te loggen bij Toodledo</string>
+    <string name="not_logged_in">Tik om in te loggen</string>
     <string name="no_tasks">Geen taken gepland</string>
-    <string name="error_offline">Offline – tik om opnieuw te proberen</string>
-    <string name="error_auth">Sessie verlopen – tik om in te loggen</string>
+    <string name="error_offline">↻ Offline – tik om te laden</string>
+    <string name="error_api">↻ Fout bij laden – tik om opnieuw te proberen</string>
+    <string name="error_auth">Login verlopen – tik om in te loggen</string>
     <string name="section_overdue">Te laat</string>
     <string name="section_today">Vandaag</string>
     <string name="section_tomorrow">Morgen</string>

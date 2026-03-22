@@ -1,10 +1,11 @@
 <resources>
     <string name="widget_name">任务</string>
     <string name="settings_title">Toodledo 小部件设置</string>
-    <string name="not_logged_in">点击登录 Toodledo</string>
+    <string name="not_logged_in">点击登录</string>
     <string name="no_tasks">没有到期任务</string>
-    <string name="error_offline">离线 – 点击重试</string>
-    <string name="error_auth">登录已过期 – 点击重新登录</string>
+    <string name="error_offline">↻ 离线 – 点击加载</string>
+    <string name="error_api">↻ 加载错误 – 点击重试</string>
+    <string name="error_auth">登录已过期 – 点击登录</string>
     <string name="section_overdue">已逾期</string>
     <string name="section_today">今天</string>
     <string name="section_tomorrow">明天</string>

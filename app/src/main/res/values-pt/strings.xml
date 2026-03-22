@@ -1,10 +1,11 @@
 <resources>
     <string name="widget_name">Tarefas</string>
     <string name="settings_title">Toodledo – Configurações do widget</string>
-    <string name="not_logged_in">Toque para entrar no Toodledo</string>
+    <string name="not_logged_in">Toque para entrar</string>
     <string name="no_tasks">Nenhuma tarefa pendente</string>
-    <string name="error_offline">Offline – toque para tentar novamente</string>
-    <string name="error_auth">Sessão expirada – toque para entrar</string>
+    <string name="error_offline">↻ Offline – toque para carregar</string>
+    <string name="error_api">↻ Erro ao carregar – toque para tentar novamente</string>
+    <string name="error_auth">Login expirado – toque para entrar</string>
     <string name="section_overdue">Atrasada</string>
     <string name="section_today">Hoje</string>
     <string name="section_tomorrow">Amanhã</string>

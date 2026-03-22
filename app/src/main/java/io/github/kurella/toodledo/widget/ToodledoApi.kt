@@ -16,6 +16,13 @@ import java.time.ZoneId
 private const val BASE_URL = "https://api.toodledo.com/3"
 private const val TASK_FIELDS = "priority,startdate,duedate,repeat,note"
 
+sealed interface FetchResult {
+    data class Success(val tasks: List<Task>) : FetchResult
+    data object AuthError : FetchResult
+    data object NetworkError : FetchResult
+    data object ApiError : FetchResult
+}
+
 class ToodledoApi(private val tokenStore: TokenStore) {
 
     private val client = OkHttpClient()
@@ -76,8 +83,8 @@ class ToodledoApi(private val tokenStore: TokenStore) {
         return refreshTokens()
     }
 
-    fun fetchTasks(): List<Task>? {
-        if (!ensureValidToken()) return null
+    fun fetchTasks(): FetchResult {
+        if (!ensureValidToken()) return FetchResult.AuthError
 
         val accessToken = URLEncoder.encode(tokenStore.accessToken, "UTF-8")
         val request = Request.Builder()
@@ -87,24 +94,31 @@ class ToodledoApi(private val tokenStore: TokenStore) {
                 "&comp=0")
             .build()
 
-        return client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) return@use null
-            val array = JSONArray(response.body?.string() ?: return@use null)
-            // First element is metadata (total count etc.), skip it
-            (1 until array.length())
-                .map { array.getJSONObject(it) }
-                .filter { it.optLong("duedate", 0) != 0L }
-                .map { entry ->
-                    Task(
-                        id = entry.getLong("id"),
-                        title = entry.getString("title"),
-                        priority = Priority.from(entry.optInt("priority", 1)),
-                        startDate = epochToDate(entry.optLong("startdate", 0)),
-                        dueDate = epochToDate(entry.optLong("duedate", 0))!!,
-                        repeat = entry.optString("repeat", ""),
-                        hasNote = entry.optString("note", "").isNotEmpty()
-                    )
-                }
+        return try {
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) return@use FetchResult.ApiError
+                val array = JSONArray(response.body?.string() ?: return@use FetchResult.ApiError)
+                // First element is metadata (total count etc.), skip it
+                val tasks = (1 until array.length())
+                    .map { array.getJSONObject(it) }
+                    .filter { it.optLong("duedate", 0) != 0L }
+                    .map { entry ->
+                        Task(
+                            id = entry.getLong("id"),
+                            title = entry.getString("title"),
+                            priority = Priority.from(entry.optInt("priority", 1)),
+                            startDate = epochToDate(entry.optLong("startdate", 0)),
+                            dueDate = epochToDate(entry.optLong("duedate", 0))!!,
+                            repeat = entry.optString("repeat", ""),
+                            hasNote = entry.optString("note", "").isNotEmpty()
+                        )
+                    }
+                FetchResult.Success(tasks)
+            }
+        } catch (_: java.io.IOException) {
+            FetchResult.NetworkError
+        } catch (_: org.json.JSONException) {
+            FetchResult.ApiError
         }
     }
 
