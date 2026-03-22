@@ -86,6 +86,10 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
                 Log.w(TAG, "loadTasks: API error")
             }
         }
+        // The Factory calls back into the Provider here — a layer inversion (adapter → controller).
+        // This is intentional: onDataSetChanged is async, so the caller of notifyAppWidgetViewDataChanged
+        // cannot know when the new status is available. Only the Factory knows, making this the only
+        // reliable place to trigger the status line update.
         TaskWidgetProvider.updateStatusLine(context)
     }
 
