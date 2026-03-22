@@ -13,8 +13,6 @@ import android.widget.RemoteViewsService
 import io.github.kurella.toodledo.widget.R
 import java.time.LocalDate
 
-private const val TAG = "ToodledoWidget"
-
 private const val OVERDUE_BACKGROUND = 0x40F44336
 private const val TRANSPARENT = 0x00000000
 
@@ -89,10 +87,6 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
             }
         }
         TaskWidgetProvider.updateStatusLine(context)
-    }
-
-    private fun writeStatus(prefs: android.content.SharedPreferences, status: WidgetStatus) {
-        prefs.edit().putString(PREF_WIDGET_STATUS, status.name).apply()
     }
 
     override fun getCount(): Int = items.size

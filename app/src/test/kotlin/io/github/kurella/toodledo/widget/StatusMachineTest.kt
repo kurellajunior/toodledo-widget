@@ -95,8 +95,8 @@ class StatusMachineTest {
         fun `Provider reads WidgetStatus in updateStatusLine`() {
             assertTrue(providerSource.contains("fun updateStatusLine"),
                 "Provider must define updateStatusLine()")
-            assertTrue(providerSource.contains("PREF_WIDGET_STATUS"),
-                "Provider.updateStatusLine must read status from SharedPreferences")
+            assertTrue(providerSource.contains("readStatus("),
+                "Provider.updateStatusLine must call readStatus()")
         }
 
         @Test

@@ -16,7 +16,7 @@ import android.widget.RemoteViews
 import android.widget.Toast
 import io.github.kurella.toodledo.widget.R
 
-private const val TAG = "ToodledoWidget"
+internal const val TAG = "ToodledoWidget"
 const val TOODLEDO_PACKAGE = "com.toodledo"
 
 const val PREFS_NAME = "widget_settings"
@@ -114,12 +114,6 @@ class TaskWidgetProvider : AppWidgetProvider() {
                 )
                 setPendingIntentTemplate(R.id.task_list, clickPending)
             }
-        }
-
-        private fun readStatus(prefs: android.content.SharedPreferences): WidgetStatus = try {
-            WidgetStatus.valueOf(prefs.getString(PREF_WIDGET_STATUS, WidgetStatus.INITIAL.name)!!)
-        } catch (_: IllegalArgumentException) {
-            WidgetStatus.INITIAL
         }
 
         private fun applyStatus(context: Context, views: RemoteViews, status: WidgetStatus) {

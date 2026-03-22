@@ -1,5 +1,7 @@
 package io.github.kurella.toodledo.widget
 
+import android.content.SharedPreferences
+
 /**
  * Represents the current data state of the widget.
  *
@@ -28,4 +30,14 @@ enum class WidgetStatus {
     LOGGED_OUT
 }
 
-const val PREF_WIDGET_STATUS = "widget_status"
+private const val PREF_WIDGET_STATUS = "widget_status"
+
+fun readStatus(prefs: SharedPreferences): WidgetStatus = try {
+    WidgetStatus.valueOf(prefs.getString(PREF_WIDGET_STATUS, WidgetStatus.INITIAL.name)!!)
+} catch (_: IllegalArgumentException) {
+    WidgetStatus.INITIAL
+}
+
+fun writeStatus(prefs: SharedPreferences, status: WidgetStatus) {
+    prefs.edit().putString(PREF_WIDGET_STATUS, status.name).apply()
+}
