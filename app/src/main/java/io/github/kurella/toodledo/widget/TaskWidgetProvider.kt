@@ -61,7 +61,6 @@ class TaskWidgetProvider : AppWidgetProvider() {
 
         fun refresh(context: Context) {
             val (manager, ids) = widgetIds(context)
-            // TODO migrate to RemoteCollectionItems when minSdk >= 31 (API 35 replacement)
             @Suppress("DEPRECATION")
             manager.notifyAppWidgetViewDataChanged(ids, R.id.task_list)
         }
@@ -102,8 +101,7 @@ class TaskWidgetProvider : AppWidgetProvider() {
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
                     data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
                 }
-                // TODO migrate to RemoteCollectionItems when minSdk >= 31 (API 35 replacement)
-                @Suppress("DEPRECATION")
+                @Suppress("DEPRECATION")  // TODO migrate to RemoteCollectionItems when minSdk >= 31
                 setRemoteAdapter(R.id.task_list, serviceIntent)
                 setScrollPosition(R.id.task_list, 0)
 
@@ -119,7 +117,7 @@ class TaskWidgetProvider : AppWidgetProvider() {
         }
 
         private fun readStatus(prefs: android.content.SharedPreferences): WidgetStatus = try {
-            WidgetStatus.valueOf(prefs.getString(PREF_WIDGET_STATUS, null) ?: WidgetStatus.INITIAL.name)
+            WidgetStatus.valueOf(prefs.getString(PREF_WIDGET_STATUS, WidgetStatus.INITIAL.name)!!)
         } catch (_: IllegalArgumentException) {
             WidgetStatus.INITIAL
         }
@@ -129,10 +127,11 @@ class TaskWidgetProvider : AppWidgetProvider() {
                 views.setViewVisibility(R.id.status_line, View.GONE)
             } else {
                 val (textRes, pending) = when (status) {
+                    WidgetStatus.INITIAL -> R.string.not_logged_in to settingsPendingIntent(context)
                     WidgetStatus.LOGGED_OUT -> R.string.error_auth to settingsPendingIntent(context)
                     WidgetStatus.OFFLINE -> R.string.error_offline to refreshPendingIntent(context)
                     WidgetStatus.API_ERROR -> R.string.error_api to refreshPendingIntent(context)
-                    else -> R.string.not_logged_in to settingsPendingIntent(context)
+                    WidgetStatus.LOADED -> error("unreachable")
                 }
                 views.setViewVisibility(R.id.status_line, View.VISIBLE)
                 views.setTextViewText(R.id.status_line, context.getString(textRes))
@@ -211,7 +210,6 @@ class TaskWidgetProvider : AppWidgetProvider() {
             manager.updateAppWidget(widgetId, buildViews(context, widgetId, status))
         }
 
-        // TODO migrate to RemoteCollectionItems when minSdk >= 31 (API 35 replacement)
         @Suppress("DEPRECATION")
         manager.notifyAppWidgetViewDataChanged(widgetIds, R.id.task_list)
         RefreshWorker.schedule(context)

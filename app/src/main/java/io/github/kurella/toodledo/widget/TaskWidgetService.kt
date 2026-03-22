@@ -35,7 +35,7 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
     private var fontScale: Float = 1.0f
     private var textColor: Int = LIGHT_TEXT
     private var sectionBackground: Int = (0xFF shl 24) or LIGHT_SECTION_BASE
-    private var sectionTextColor: Int = SECTION_TEXT_COLOR
+    private val sectionTextColor: Int = SECTION_TEXT_COLOR
 
     override fun onCreate() {
         Log.d(TAG, "Factory.onCreate")
@@ -52,7 +52,6 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         fontScale = prefs.getInt(PREF_FONT_SIZE, DEFAULT_FONT_SIZE) / 100f
         textColor = TaskWidgetProvider.textColor(context)
-        sectionTextColor = SECTION_TEXT_COLOR
         sectionBackground = TaskWidgetProvider.sectionColor(context)
 
         val tokenStore = TokenStore(context)
@@ -188,7 +187,7 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
 
     override fun getLoadingView(): RemoteViews? = null
 
-    override fun getViewTypeCount(): Int = 2
+    override fun getViewTypeCount(): Int = 2  // widget_task_row + widget_section_header
     override fun getItemId(position: Int): Long = position.toLong()
     override fun hasStableIds(): Boolean = false
     override fun onDestroy() {}
