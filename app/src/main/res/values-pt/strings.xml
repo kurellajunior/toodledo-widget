@@ -19,6 +19,7 @@
     <string name="refresh">↻ Atualizar</string>
     <string name="login_hint">Entre no Toodledo para exibir suas tarefas.</string>
     <string name="logout_hint">Você está conectado. Suas tarefas são exibidas no widget.</string>
+    <string name="close">Fechar</string>
     <string name="add_task">Adicionar tarefa</string>
     <string name="donate_hint">Se você gostou deste widget, pode me pagar um café virtual ☕\n\npaypal.me/JanKurella</string>
 </resources>

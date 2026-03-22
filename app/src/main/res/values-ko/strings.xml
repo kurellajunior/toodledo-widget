@@ -19,6 +19,7 @@
     <string name="refresh">↻ 새로고침</string>
     <string name="login_hint">Toodledo에 로그인하여 작업을 표시하세요.</string>
     <string name="logout_hint">로그인되어 있습니다. 작업이 위젯에 표시됩니다.</string>
+    <string name="close">닫기</string>
     <string name="add_task">작업 추가</string>
     <string name="donate_hint">이 위젯이 마음에 드셨다면 가상 커피 한 잔 사주시면 감사하겠습니다 ☕\n\npaypal.me/JanKurella</string>
 </resources>

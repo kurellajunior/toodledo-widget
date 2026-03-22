@@ -19,6 +19,7 @@
     <string name="refresh">↻ Обновить</string>
     <string name="login_hint">Войдите в Toodledo, чтобы отобразить ваши задачи.</string>
     <string name="logout_hint">Вы вошли в систему. Ваши задачи отображаются на виджете.</string>
+    <string name="close">Закрыть</string>
     <string name="add_task">Добавить задачу</string>
     <string name="donate_hint">Если вам нравится этот виджет, буду рад виртуальной чашке кофе ☕\n\npaypal.me/JanKurella</string>
 </resources>

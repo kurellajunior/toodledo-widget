@@ -19,6 +19,7 @@
     <string name="refresh">↻ Aggiorna</string>
     <string name="login_hint">Accedi a Toodledo per visualizzare le tue attività.</string>
     <string name="logout_hint">Hai effettuato l\'accesso. Le tue attività sono mostrate sul widget.</string>
+    <string name="close">Chiudi</string>
     <string name="add_task">Aggiungi attività</string>
     <string name="donate_hint">Se ti piace questo widget, puoi offrirmi un caffè virtuale ☕\n\npaypal.me/JanKurella</string>
 </resources>

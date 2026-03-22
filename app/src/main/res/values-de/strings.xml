@@ -19,6 +19,7 @@
     <string name="refresh">↻ Aktualisieren</string>
     <string name="login_hint">Melde dich bei Toodledo an, um deine Aufgaben anzuzeigen.</string>
     <string name="logout_hint">Du bist angemeldet. Deine Aufgaben werden im Widget angezeigt.</string>
+    <string name="close">Schließen</string>
     <string name="add_task">Aufgabe hinzufügen</string>
     <string name="donate_hint">Wenn dir das Widget gefällt, kannst du mich gern auf einen virtuellen Kaffee einladen ☕\n\npaypal.me/JanKurella</string>
 </resources>

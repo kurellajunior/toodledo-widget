@@ -19,6 +19,7 @@
     <string name="refresh">↻ Vernieuwen</string>
     <string name="login_hint">Log in bij Toodledo om je taken te tonen.</string>
     <string name="logout_hint">Je bent ingelogd. Je taken worden op de widget getoond.</string>
+    <string name="close">Sluiten</string>
     <string name="add_task">Taak toevoegen</string>
     <string name="donate_hint">Als je deze widget leuk vindt, trakteer me dan gerust op een virtueel kopje koffie ☕\n\npaypal.me/JanKurella</string>
 </resources>

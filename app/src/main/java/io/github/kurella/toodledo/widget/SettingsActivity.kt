@@ -21,6 +21,7 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
 
         val loginButton = findViewById<Button>(R.id.login_button)
+        findViewById<Button>(R.id.close_button).setOnClickListener { finish() }
 
         bindSeekBar(
             barId = R.id.transparency_bar, labelId = R.id.transparency_label,
@@ -91,12 +92,17 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun updateLoginButton(button: Button, tokenStore: TokenStore) {
         val hint = findViewById<TextView>(R.id.login_hint)
+        val closeButton = findViewById<Button>(R.id.close_button)
         if (tokenStore.isLoggedIn) {
             button.text = getString(R.string.logout)
             hint.text = getString(R.string.logout_hint)
+            button.alpha = 0.6f
+            closeButton.alpha = 1.0f
         } else {
             button.text = getString(R.string.login)
             hint.text = getString(R.string.login_hint)
+            button.alpha = 1.0f
+            closeButton.alpha = 0.6f
         }
     }
 }
