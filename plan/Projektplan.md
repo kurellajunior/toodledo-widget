@@ -218,12 +218,16 @@ notwendige Scripte, um den Prozess in der Zukunft einfach zu gestalten.
 - Status State Machine (5 Zustände) mit typisiertem FetchResult
 - Statusanzeige als ListView-Item (statt separatem View) — behebt
   RemoteViews-Race-Condition auf Android 16
-- Shortcut „Aufgabe hinzufügen" entfernt (AddTaskActivity, shortcuts.xml,
-  ic_add_task.xml). Wird durch ein separates 1x1 Add-Task Widget ersetzt.
+- Shortcut „Aufgabe hinzufügen" entfernt (AddTaskActivity, shortcuts.xml)
 - Settings: Schließen-Button, dynamische CTA-Hervorhebung, Spendenhinweis
+- 1x1 Add-Task Widget: Icon im Toodledo-Stil (blauer Hintergrund, weißer
+  Kreis, oranges Plus), öffnet Task-Erstellung via ACTION_SEND Intent
+- README und alle 12 Store-Listings für zwei Widgets aktualisiert
 - Projektplan aktualisiert
 
-### Offen
+### Nächste Schritte
 
-- 1x1 Add-Task Widget (Icon-Design-Phase, dann Implementierung)
+- Manuelles Testen auf Telefon und Emulator (einige Tage)
+- Screenshots für Play Store vorbereiten
+- Play Store Veröffentlichung (Phase 3 Abschluss)
 
