@@ -22,4 +22,5 @@
     <string name="close">Stäng</string>
     <string name="add_task">Lägg till uppgift</string>
     <string name="donate_hint">Om du gillar den här widgeten får du gärna bjuda mig på en virtuell kaffe ☕\n\npaypal.me/JanKurella</string>
+    <string name="feedback_hint">Hittat en bugg? Har du en idé? Hör av dig!</string>
 </resources>

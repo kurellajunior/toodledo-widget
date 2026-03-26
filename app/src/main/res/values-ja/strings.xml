@@ -22,4 +22,5 @@
     <string name="close">閉じる</string>
     <string name="add_task">タスクを追加</string>
     <string name="donate_hint">このウィジェットを気に入っていただけたら、バーチャルコーヒーをおごっていただけると嬉しいです ☕\n\npaypal.me/JanKurella</string>
+    <string name="feedback_hint">バグを見つけた？アイデアがある？ぜひ教えてください！</string>
 </resources>

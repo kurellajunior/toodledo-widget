@@ -22,4 +22,5 @@
     <string name="close">Fechar</string>
     <string name="add_task">Adicionar tarefa</string>
     <string name="donate_hint">Se você gostou deste widget, pode me pagar um café virtual ☕\n\npaypal.me/JanKurella</string>
+    <string name="feedback_hint">Encontrou um bug? Tem uma ideia? Me avise!</string>
 </resources>

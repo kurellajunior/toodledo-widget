@@ -22,4 +22,5 @@
     <string name="close">Закрыть</string>
     <string name="add_task">Добавить задачу</string>
     <string name="donate_hint">Если вам нравится этот виджет, буду рад виртуальной чашке кофе ☕\n\npaypal.me/JanKurella</string>
+    <string name="feedback_hint">Нашли ошибку? Есть идея? Напишите мне!</string>
 </resources>

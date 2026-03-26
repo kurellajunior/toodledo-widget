@@ -58,6 +58,11 @@ class SettingsActivity : AppCompatActivity() {
             TaskWidgetProvider.fullUpdate(this)
         }
 
+        findViewById<android.view.View>(R.id.feedback_link).setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://github.com/kurellajunior/toodledo-widget/issues")))
+        }
+
         RefreshWorker.schedule(this)
     }
 

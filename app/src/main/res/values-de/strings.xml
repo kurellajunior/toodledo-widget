@@ -22,4 +22,5 @@
     <string name="close">Schließen</string>
     <string name="add_task">Aufgabe hinzufügen</string>
     <string name="donate_hint">Wenn dir das Widget gefällt, kannst du mich gern auf einen virtuellen Kaffee einladen ☕\n\npaypal.me/JanKurella</string>
+    <string name="feedback_hint">Fehler gefunden? Idee oder Vorschlag? Schreib mir!</string>
 </resources>

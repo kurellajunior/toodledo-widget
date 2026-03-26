@@ -22,4 +22,5 @@
     <string name="close">关闭</string>
     <string name="add_task">添加任务</string>
     <string name="donate_hint">如果您喜欢这个小部件，欢迎请我喝杯虚拟咖啡 ☕\n\npaypal.me/JanKurella</string>
+    <string name="feedback_hint">发现问题或有建议？欢迎告诉我！</string>
 </resources>

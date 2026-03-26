@@ -22,4 +22,5 @@
     <string name="close">Sluiten</string>
     <string name="add_task">Taak toevoegen</string>
     <string name="donate_hint">Als je deze widget leuk vindt, trakteer me dan gerust op een virtueel kopje koffie ☕\n\npaypal.me/JanKurella</string>
+    <string name="feedback_hint">Bug gevonden? Een idee? Laat het me weten!</string>
 </resources>

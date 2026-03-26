@@ -22,4 +22,5 @@
     <string name="close">닫기</string>
     <string name="add_task">작업 추가</string>
     <string name="donate_hint">이 위젯이 마음에 드셨다면 가상 커피 한 잔 사주시면 감사하겠습니다 ☕\n\npaypal.me/JanKurella</string>
+    <string name="feedback_hint">버그를 발견하셨나요? 아이디어가 있으신가요? 알려주세요!</string>
 </resources>
