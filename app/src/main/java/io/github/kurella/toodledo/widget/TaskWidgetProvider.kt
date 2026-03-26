@@ -91,7 +91,7 @@ class TaskWidgetProvider : AppWidgetProvider() {
                     action = "item_click"
                 }
                 val clickPending = PendingIntent.getBroadcast(
-                    context, 0, clickIntent,
+                    context, widgetId, clickIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
                 )
                 setPendingIntentTemplate(R.id.task_list, clickPending)
