@@ -30,6 +30,7 @@ class TaskWidgetService : RemoteViewsService() {
 class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteViewsFactory {
 
     private var items: List<ListItem> = emptyList()
+    private var pendingId: Long = -1
     private var fontScale: Float = 1.0f
     private var textColor: Int = LIGHT_TEXT
     private var sectionBackground: Int = (0xFF shl 24) or LIGHT_SECTION_BASE
@@ -49,8 +50,15 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
     private fun loadTasks() {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         fontScale = prefs.getInt(PREF_FONT_SIZE, DEFAULT_FONT_SIZE) / 100f
+        pendingId = prefs.getLong(PREF_PENDING_COMPLETE, -1)
         textColor = TaskWidgetProvider.textColor(context)
         sectionBackground = TaskWidgetProvider.sectionColor(context)
+
+        // Just redraw with checkmark, don't refetch
+        if (pendingId != -1L && items.isNotEmpty()) {
+            Log.d(TAG, "loadTasks: skipping fetch, showing pending checkmark for $pendingId")
+            return
+        }
 
         val tokenStore = TokenStore(context)
         if (!tokenStore.isLoggedIn) {
@@ -149,6 +157,13 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
             }
 
             setInt(R.id.priority_box, "setBackgroundColor", task.priority.color)
+            if (task.id == pendingId) {
+                setTextViewText(R.id.priority_box, "✓")
+                setTextColor(R.id.priority_box, 0xFFFFFFFF.toInt())
+                setInt(R.id.priority_box, "setGravity", Gravity.CENTER)
+            } else {
+                setTextViewText(R.id.priority_box, "")
+            }
             setInt(R.id.task_row, "setBackgroundColor",
                 if (overdue) OVERDUE_BACKGROUND else TRANSPARENT)
 

@@ -21,6 +21,7 @@ const val TOODLEDO_PACKAGE = "com.toodledo"
 const val PREFS_NAME = "widget_settings"
 const val PREF_TRANSPARENCY = "transparency"
 const val PREF_FONT_SIZE = "font_size"
+internal const val PREF_PENDING_COMPLETE = "pending_complete"
 private const val DEFAULT_TRANSPARENCY = 25
 const val DEFAULT_FONT_SIZE = 100
 
@@ -162,6 +163,11 @@ class TaskWidgetProvider : AppWidgetProvider() {
                 val taskId = intent.getLongExtra("task_id", -1)
                 if (taskId != -1L) {
                     val appContext = context.applicationContext
+                    val prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                    // Show checkmark immediately
+                    prefs.edit().putLong(PREF_PENDING_COMPLETE, taskId).apply()
+                    refresh(appContext)
+                    // API call in background
                     Thread {
                         val success = try {
                             ToodledoApi(TokenStore(appContext)).completeTask(taskId)
@@ -169,14 +175,14 @@ class TaskWidgetProvider : AppWidgetProvider() {
                             Log.e(TAG, "completeTask failed", e)
                             false
                         }
-                        if (success) {
-                            refresh(appContext)
-                        } else {
+                        prefs.edit().remove(PREF_PENDING_COMPLETE).apply()
+                        if (!success) {
                             Handler(Looper.getMainLooper()).post {
                                 Toast.makeText(appContext,
                                     R.string.error_offline, Toast.LENGTH_SHORT).show()
                             }
                         }
+                        refresh(appContext)
                     }.start()
                 }
             }
