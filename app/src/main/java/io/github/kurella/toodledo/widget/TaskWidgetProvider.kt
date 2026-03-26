@@ -188,13 +188,13 @@ class TaskWidgetProvider : AppWidgetProvider() {
             )
             "refresh" -> {
                 Log.d(TAG, "Refresh from list item")
-                fullUpdate(context)
+                refresh(context)
             }
         }
 
         if (intent.action == ACTION_REFRESH) {
             Log.d(TAG, "ACTION_REFRESH received")
-            fullUpdate(context)
+            refresh(context)
         }
     }
 

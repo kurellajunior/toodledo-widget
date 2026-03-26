@@ -73,20 +73,30 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
                 Log.d(TAG, "loadTasks: ${result.tasks.size} tasks → ${items.size} items")
             }
             is FetchResult.AuthError -> {
-                items = listOf(statusItem(WidgetStatus.LOGGED_OUT))
+                items = errorItems(WidgetStatus.LOGGED_OUT)
                 writeStatus(prefs, WidgetStatus.LOGGED_OUT)
                 Log.w(TAG, "loadTasks: auth error")
             }
             is FetchResult.NetworkError -> {
-                items = listOf(statusItem(WidgetStatus.OFFLINE))
+                items = errorItems(WidgetStatus.OFFLINE)
                 writeStatus(prefs, WidgetStatus.OFFLINE)
                 Log.w(TAG, "loadTasks: network error")
             }
             is FetchResult.ApiError -> {
-                items = listOf(statusItem(WidgetStatus.API_ERROR))
+                items = errorItems(WidgetStatus.API_ERROR)
                 writeStatus(prefs, WidgetStatus.API_ERROR)
                 Log.w(TAG, "loadTasks: API error")
             }
+        }
+    }
+
+    /** Preserve previous task list on error, prepend status banner. */
+    private fun errorItems(status: WidgetStatus): List<ListItem> {
+        val previous = items.filter { it is ListItem.TaskItem || it is ListItem.SectionHeader }
+        return if (previous.isNotEmpty()) {
+            listOf(statusItem(status)) + previous + ListItem.RefreshItem
+        } else {
+            listOf(statusItem(status))
         }
     }
 
