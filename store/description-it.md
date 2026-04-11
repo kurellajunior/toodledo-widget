@@ -14,7 +14,7 @@ Lista attività (ridimensionabile):
 • Attività in ritardo, di oggi e future a colpo d'occhio
 • Livelli di priorità codificati per colore (massima, alta, normale, bassa)
 • Icone per note e attività ricorrenti
-• Segna le attività come completate direttamente dal widget
+• Segna le attività come completate direttamente dal widget — le attività ricorrenti vengono ripianificate automaticamente
 • Tocca un'attività per aprirla nell'app Toodledo o nel browser
 • Sincronizzazione automatica in background ogni ora
 • Aggiornamento manuale con un tocco

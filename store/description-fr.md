@@ -14,7 +14,7 @@ Liste de tâches (redimensionnable) :
 • Tâches en retard, du jour et à venir d'un coup d'œil
 • Niveaux de priorité codés par couleur (maximale, haute, normale, basse)
 • Icônes pour les notes et les tâches récurrentes
-• Marquer les tâches comme terminées directement depuis le widget
+• Marquer les tâches comme terminées directement depuis le widget — les tâches récurrentes sont automatiquement replanifiées
 • Appuyez sur une tâche pour l'ouvrir dans l'appli Toodledo ou le navigateur
 • Synchronisation automatique en arrière-plan toutes les heures
 • Actualisation manuelle par simple touche

@@ -14,7 +14,7 @@ Uppgiftslista (skalbar):
 • Försenade, dagens och kommande uppgifter i en överblick
 • Färgkodade prioritetsnivåer (högsta, hög, normal, låg)
 • Ikoner för anteckningar och återkommande uppgifter
-• Markera uppgifter som klara direkt i widgeten
+• Markera uppgifter som klara direkt i widgeten — återkommande uppgifter schemaläggs om automatiskt
 • Tryck på en uppgift för att öppna den i Toodledo-appen eller webbläsaren
 • Automatisk synkronisering i bakgrunden varje timme
 • Manuell uppdatering genom att trycka

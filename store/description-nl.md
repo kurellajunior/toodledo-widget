@@ -14,7 +14,7 @@ Takenlijst (schaalbaar):
 • Achterstallige, vandaag en komende taken in één oogopslag
 • Kleurgecodeerde prioriteitsniveaus (hoogste, hoog, normaal, laag)
 • Iconen voor notities en herhalende taken
-• Taken direct in het widget als voltooid markeren
+• Taken direct in het widget als voltooid markeren — herhalende taken worden automatisch opnieuw ingepland
 • Tik op een taak om deze te openen in de Toodledo-app of browser
 • Automatische synchronisatie op de achtergrond elk uur
 • Handmatig verversen door tikken

@@ -108,8 +108,9 @@ Der Eintrag im Playstore soll Englisch sein.
     data.
   - Nur die Informationen laden, die benötigt werden: id, priority, title,
     begind and due date, repeat, note. Keine completed laden/zeigen. Repeat
-    nur für die Anzeige des Kreispfeils. Note nur für die Anzeige des
-    Dokument-Symbols (ob vorhanden, nicht der Inhalt).
+    für die Anzeige des Kreispfeils und für das client-seitige Neueinplanen.
+    Note nur für die Anzeige des Dokument-Symbols (ob vorhanden, nicht der
+    Inhalt).
   - API-Key Handling: Client ID und Client Secret werden nicht im Repo
     gespeichert. Sie werden über `local.properties` (gitignored) eingetragen
     und zur Build-Zeit als BuildConfig-Felder injiziert. OAuth-Tokens des
@@ -214,6 +215,11 @@ notwendige Scripte, um den Prozess in der Zukunft einfach zu gestalten.
 
 ### Erledigt in Phase 3
 
+- Wiederkehrende Aufgaben: client-seitiges Neueinplanen beim Abhaken
+  (Toodledos öffentliche API erzeugt keine Folgeaufgaben). `RepeatCalculator`
+  implementiert RFC 5545 RRULE-Subset (FREQ, INTERVAL, BYDAY, BYMONTHDAY)
+  plus Toodledo-Extension FROMCOMP. Ergebnis: (nextStart, nextDue) — immer
+  in der Zukunft, ungültige Lead-Times werden verworfen. 51 Unit-Tests.
 - Play Store Listings in 12 Sprachen erstellt
 - Status State Machine (5 Zustände) mit typisiertem FetchResult
 - Statusanzeige als ListView-Item (statt separatem View) — behebt

@@ -12,7 +12,7 @@ Aufgabenliste (skalierbar):
 • Überfällige, heutige und kommende Aufgaben auf einen Blick
 • Farbcodierte Dringlichkeitsstufen (höchste, hoch, normal, niedrig)
 • Symbole für Notizen und wiederkehrende Aufgaben
-• Aufgaben direkt im Widget als erledigt markieren
+• Aufgaben direkt im Widget als erledigt markieren — wiederkehrende Aufgaben werden automatisch neu eingeplant
 • Antippen öffnet die Aufgabe in der Toodledo-App oder im Browser
 • Automatische stündliche Synchronisation im Hintergrund
 • Manuelles Aktualisieren durch Tippen möglich

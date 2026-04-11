@@ -14,7 +14,7 @@ Lista de tareas (redimensionable):
 • Tareas atrasadas, de hoy y próximas de un vistazo
 • Niveles de prioridad codificados por color (máxima, alta, normal, baja)
 • Iconos para notas y tareas recurrentes
-• Marca tareas como completadas directamente desde el widget
+• Marca tareas como completadas directamente desde el widget — las tareas repetidas se reprograman automáticamente
 • Toca una tarea para abrirla en la app de Toodledo o en el navegador
 • Sincronización automática en segundo plano cada hora
 • Actualización manual tocando

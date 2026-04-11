@@ -16,7 +16,7 @@ of its respective owner.
 - Color-coded priority indicators
 - Note indicator for tasks with additional text
 - Repeat indicator for recurring tasks
-- Mark tasks as complete directly from the widget
+- Mark tasks as complete directly from the widget — repeating tasks are automatically rescheduled
 - Tap a task to open it in the Toodledo app or website
 - Pull down to refresh
 - Automatic hourly background sync

@@ -12,7 +12,7 @@ Task List Widget (resizable):
 • Overdue, today, and upcoming tasks at a glance
 • Color-coded priority levels (top, high, medium, low)
 • Icons for notes and recurring tasks
-• Mark tasks as done right from the widget
+• Mark tasks as done right from the widget — repeating tasks are automatically rescheduled
 • Tap a task to open it in the Toodledo app or browser
 • Automatic hourly background sync
 • Manual refresh by tapping
