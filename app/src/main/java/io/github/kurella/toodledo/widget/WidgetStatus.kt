@@ -1,6 +1,7 @@
 package io.github.kurella.toodledo.widget
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 /**
  * Represents the current data state of the widget.
@@ -39,5 +40,5 @@ fun readStatus(prefs: SharedPreferences): WidgetStatus = try {
 }
 
 fun writeStatus(prefs: SharedPreferences, status: WidgetStatus) {
-    prefs.edit().putString(PREF_WIDGET_STATUS, status.name).apply()
+    prefs.edit { putString(PREF_WIDGET_STATUS, status.name) }
 }

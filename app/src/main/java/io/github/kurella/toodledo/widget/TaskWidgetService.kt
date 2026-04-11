@@ -10,7 +10,6 @@ import android.view.Gravity
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import io.github.kurella.toodledo.widget.R
 import java.time.LocalDate
 
 private const val OVERDUE_BACKGROUND = 0x40F44336
@@ -63,53 +62,53 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
         val tokenStore = TokenStore(context)
         if (!tokenStore.isLoggedIn) {
             Log.d(TAG, "loadTasks: not logged in")
-            items = listOf(statusItem(WidgetStatus.INITIAL))
             writeStatus(prefs, WidgetStatus.INITIAL)
+            items = listOf(statusItem())
             return
         }
 
-        val api = ToodledoApi(tokenStore)
-        when (val result = api.fetchTasks()) {
+        when (val result = ToodledoApi(tokenStore).fetchTasks()) {
             is FetchResult.Success -> {
                 val taskItems = TaskSorter.buildList(result.tasks, context)
+                writeStatus(prefs, WidgetStatus.LOADED)
                 items = if (taskItems.isEmpty()) {
                     listOf(ListItem.EmptyItem, ListItem.RefreshItem)
                 } else {
                     taskItems + ListItem.RefreshItem
                 }
-                writeStatus(prefs, WidgetStatus.LOADED)
                 Log.d(TAG, "loadTasks: ${result.tasks.size} tasks → ${items.size} items")
             }
             is FetchResult.AuthError -> {
-                items = errorItems(WidgetStatus.LOGGED_OUT)
                 writeStatus(prefs, WidgetStatus.LOGGED_OUT)
+                items = errorItems()
                 Log.w(TAG, "loadTasks: auth error")
             }
             is FetchResult.NetworkError -> {
-                items = errorItems(WidgetStatus.OFFLINE)
                 writeStatus(prefs, WidgetStatus.OFFLINE)
+                items = errorItems()
                 Log.w(TAG, "loadTasks: network error")
             }
             is FetchResult.ApiError -> {
-                items = errorItems(WidgetStatus.API_ERROR)
                 writeStatus(prefs, WidgetStatus.API_ERROR)
+                items = errorItems()
                 Log.w(TAG, "loadTasks: API error")
             }
         }
     }
 
     /** Preserve previous task list on error, prepend status banner. */
-    private fun errorItems(status: WidgetStatus): List<ListItem> {
+    private fun errorItems(): List<ListItem> {
         val previous = items.filter { it is ListItem.TaskItem || it is ListItem.SectionHeader }
-        return if (previous.isNotEmpty()) {
-            listOf(statusItem(status)) + previous + ListItem.RefreshItem
+        return if (previous.isEmpty()) {
+            listOf(statusItem())
         } else {
-            listOf(statusItem(status))
+            listOf(statusItem()) + previous + ListItem.RefreshItem
         }
     }
 
-    private fun statusItem(status: WidgetStatus): ListItem.StatusItem {
-        val (textRes, action) = when (status) {
+    private fun statusItem(): ListItem.StatusItem {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val (textRes, action) = when (readStatus(prefs)) {
             WidgetStatus.INITIAL -> R.string.not_logged_in to "settings"
             WidgetStatus.LOGGED_OUT -> R.string.error_auth to "settings"
             WidgetStatus.OFFLINE -> R.string.error_offline to "refresh"
@@ -142,8 +141,7 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
     }
 
     private fun buildTaskView(task: Task): RemoteViews {
-        val today = LocalDate.now()
-        val overdue = task.category(today) == Category.OVERDUE
+        val overdue = task.category(LocalDate.now()) == Category.OVERDUE
 
         return RemoteViews(context.packageName, R.layout.widget_task_row).apply {
             setTextViewText(R.id.task_title, task.title)
@@ -172,6 +170,9 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
 
             setOnClickFillInIntent(R.id.priority_frame, Intent().apply {
                 putExtra("task_id", task.id)
+                putExtra("task_repeat", task.repeat)
+                putExtra("task_duedate", task.dueDate.toEpochDay())
+                task.startDate?.let { putExtra("task_startdate", it.toEpochDay()) }
                 putExtra("action", "complete")
             })
             setOnClickFillInIntent(R.id.task_title, Intent().apply {

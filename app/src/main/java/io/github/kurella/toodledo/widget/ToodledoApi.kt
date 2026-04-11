@@ -1,7 +1,6 @@
 package io.github.kurella.toodledo.widget
 
 import android.util.Base64
-import io.github.kurella.toodledo.widget.BuildConfig
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,9 +11,7 @@ import java.net.URLEncoder
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-
-private const val BASE_URL = "https://api.toodledo.com/3"
-private const val TASK_FIELDS = "priority,startdate,duedate,repeat,note"
+import java.time.ZoneOffset
 
 sealed interface FetchResult {
     data class Success(val tasks: List<Task>) : FetchResult
@@ -30,7 +27,7 @@ class ToodledoApi(private val tokenStore: TokenStore) {
     fun buildAuthUrl(): String {
         val clientId = URLEncoder.encode(BuildConfig.TOODLEDO_CLIENT_ID, "UTF-8")
         val redirectUri = URLEncoder.encode(BuildConfig.TOODLEDO_REDIRECT_URI, "UTF-8")
-        return "$BASE_URL/account/authorize.php" +
+        return "$BASE_API_URL/account/authorize.php" +
             "?response_type=code" +
             "&client_id=$clientId" +
             "&state=auth" +
@@ -61,26 +58,26 @@ class ToodledoApi(private val tokenStore: TokenStore) {
         val encoded = Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
 
         val request = Request.Builder()
-            .url("$BASE_URL/account/token.php")
+            .url("$BASE_API_URL/account/token.php")
             .header("Authorization", "Basic $encoded")
             .post(body)
             .build()
 
         return client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) return@use false
-            val json = JSONObject(response.body?.string() ?: return@use false)
+            val json = JSONObject(response.body.string())
             if (json.has("errorCode")) return@use false
 
             tokenStore.accessToken = json.getString("access_token")
             tokenStore.refreshToken = json.getString("refresh_token")
-            tokenStore.expiresAt = System.currentTimeMillis() / 1000 + json.getLong("expires_in")
+            // refresh 5s early to prevent edge cases between expiry check and request
+            tokenStore.expiresAt = System.currentTimeMillis() / 1000 + json.getLong("expires_in") - 5
             true
         }
     }
 
     private fun ensureValidToken(): Boolean {
-        if (!tokenStore.isExpired) return true
-        return refreshTokens()
+        return !tokenStore.isExpired || refreshTokens()
     }
 
     fun fetchTasks(): FetchResult {
@@ -88,29 +85,29 @@ class ToodledoApi(private val tokenStore: TokenStore) {
 
         val accessToken = URLEncoder.encode(tokenStore.accessToken, "UTF-8")
         val request = Request.Builder()
-            .url("$BASE_URL/tasks/get.php" +
-                "?access_token=$accessToken" +
-                "&fields=$TASK_FIELDS" +
-                "&comp=0")
+            .url("$BASE_API_URL/tasks/get.php" +
+                    "?access_token=$accessToken" +
+                    "&fields=priority,startdate,duedate,repeat,note" +
+                    "&comp=0")
             .build()
 
         return try {
             client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) return@use FetchResult.ApiError
-                val array = JSONArray(response.body?.string() ?: return@use FetchResult.ApiError)
+                val array = JSONArray(response.body.string())
                 // First element is metadata (total count etc.), skip it
                 val tasks = (1 until array.length())
                     .map { array.getJSONObject(it) }
-                    .filter { it.optLong("duedate", 0) != 0L }
+                    .filter { it.optLong("duedate") != 0L }
                     .map { entry ->
                         Task(
                             id = entry.getLong("id"),
                             title = entry.getString("title"),
                             priority = Priority.from(entry.optInt("priority", 1)),
-                            startDate = epochToDate(entry.optLong("startdate", 0)),
-                            dueDate = epochToDate(entry.optLong("duedate", 0))!!,
-                            repeat = entry.optString("repeat", ""),
-                            hasNote = entry.optString("note", "").isNotEmpty()
+                            startDate = epochToDate(entry.optLong("startdate")),
+                            dueDate = epochToDate(entry.optLong("duedate"))!!,
+                            repeat = entry.optString("repeat"),
+                            hasNote = entry.optString("note").isNotEmpty()
                         )
                     }
                 FetchResult.Success(tasks)
@@ -125,22 +122,36 @@ class ToodledoApi(private val tokenStore: TokenStore) {
     fun completeTask(taskId: Long): Boolean {
         if (!ensureValidToken()) return false
 
-        val now = System.currentTimeMillis() / 1000
         val body = FormBody.Builder()
             .add("access_token", tokenStore.accessToken ?: return false)
-            .add("tasks", "[{\"id\":$taskId,\"completed\":$now}]")
+            .add("tasks", JSONArray().put(JSONObject()
+                .put("id", taskId)
+                .put("completed", System.currentTimeMillis() / 1000)
+            ).toString())
             .build()
 
-        val request = Request.Builder()
-            .url("$BASE_URL/tasks/edit.php")
-            .post(body)
-            .build()
-
-        return client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) return@use false
-            val responseBody = response.body?.string() ?: return@use false
+        return client.newCall(Request.Builder().url("$BASE_API_URL/tasks/edit.php").post(body).build()).execute().use { response ->
             // Toodledo returns a JSONArray on success, a JSONObject with errorCode on failure
-            JSONTokener(responseBody).nextValue() is JSONArray
+            response.isSuccessful && JSONTokener(response.body.string()).nextValue() is JSONArray
+            // TODO: return error string instead (Option?) and show error in status line
+        }
+    }
+
+    fun rescheduleTask(taskId: Long, newDueDate: LocalDate, newStartDate: LocalDate?): Boolean {
+        if (!ensureValidToken()) return false
+
+        val body = FormBody.Builder()
+            .add("access_token", tokenStore.accessToken ?: return false)
+            .add("tasks", JSONArray().put(JSONObject()
+                .put("id", taskId)
+                .put("duedate", newDueDate.atStartOfDay(ZoneOffset.UTC).toEpochSecond())
+                .putOpt("startdate", newStartDate?.atStartOfDay(ZoneOffset.UTC)?.toEpochSecond())
+            ).toString())
+            .build()
+
+        return client.newCall(Request.Builder().url("$BASE_API_URL/tasks/edit.php").post(body).build()).execute().use { response ->
+            response.isSuccessful && JSONTokener(response.body.string()).nextValue() is JSONArray
+            // TODO: return error string instead (Option?) and show error in status line
         }
     }
 
@@ -153,5 +164,6 @@ class ToodledoApi(private val tokenStore: TokenStore) {
 
     companion object {
         const val WEB_TASKS_URL = "https://www.toodledo.com/tasks/index.php"
+        private const val BASE_API_URL = "https://api.toodledo.com/3"
     }
 }

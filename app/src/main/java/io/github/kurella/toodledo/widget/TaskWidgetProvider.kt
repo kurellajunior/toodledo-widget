@@ -14,6 +14,10 @@ import android.util.Log
 import android.widget.RemoteViews
 import android.widget.Toast
 import io.github.kurella.toodledo.widget.R
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import androidx.core.net.toUri
+import androidx.core.content.edit
 
 internal const val TAG = "ToodledoWidget"
 const val TOODLEDO_PACKAGE = "com.toodledo"
@@ -39,10 +43,10 @@ fun openToodledo(context: Context) {
         appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(appIntent)
     } else {
-        context.startActivity(Intent(Intent.ACTION_VIEW,
-            Uri.parse(ToodledoApi.WEB_TASKS_URL)).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        })
+        context.startActivity(
+            Intent(Intent.ACTION_VIEW, ToodledoApi.WEB_TASKS_URL.toUri())
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
     }
 }
 
@@ -81,7 +85,7 @@ class TaskWidgetProvider : AppWidgetProvider() {
 
                 val serviceIntent = Intent(context, TaskWidgetService::class.java).apply {
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-                    data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+                    data = toUri(Intent.URI_INTENT_SCHEME).toUri()
                 }
                 @Suppress("DEPRECATION")  // TODO migrate to RemoteCollectionItems when minSdk >= 31
                 setRemoteAdapter(R.id.task_list, serviceIntent)
@@ -142,9 +146,7 @@ class TaskWidgetProvider : AppWidgetProvider() {
             if (isDarkMode(context)) DARK_TEXT else LIGHT_TEXT
     }
 
-    override fun onUpdate(
-        context: Context, manager: AppWidgetManager, widgetIds: IntArray
-    ) {
+    override fun onUpdate(context: Context, manager: AppWidgetManager, widgetIds: IntArray) {
         Log.d(TAG, "onUpdate: ${widgetIds.size} widgets")
         for (widgetId in widgetIds) {
             manager.updateAppWidget(widgetId, buildViews(context, widgetId))
@@ -161,21 +163,41 @@ class TaskWidgetProvider : AppWidgetProvider() {
         when (intent.getStringExtra("action")) {
             "complete" -> {
                 val taskId = intent.getLongExtra("task_id", -1)
+                val taskRepeat = intent.getStringExtra("task_repeat") ?: ""
+                val taskDueDay = intent.getLongExtra("task_duedate", Long.MIN_VALUE)
+                val taskStartDay = intent.getLongExtra("task_startdate", Long.MIN_VALUE)
                 if (taskId != -1L) {
                     val appContext = context.applicationContext
                     val prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                     // Show checkmark immediately
-                    prefs.edit().putLong(PREF_PENDING_COMPLETE, taskId).apply()
+                    prefs.edit { putLong(PREF_PENDING_COMPLETE, taskId) }
                     refresh(appContext)
                     // API call in background
                     Thread {
+                        val api = ToodledoApi(TokenStore(appContext))
                         val success = try {
-                            ToodledoApi(TokenStore(appContext)).completeTask(taskId)
+                            val isRepeating = taskRepeat.isNotEmpty() && taskRepeat != "None" && taskRepeat != "PARENT"
+                            if (isRepeating && taskDueDay != Long.MIN_VALUE) {
+                                val dueDate = LocalDate.ofEpochDay(taskDueDay)
+                                val startDate = if (taskStartDay != Long.MIN_VALUE)
+                                    LocalDate.ofEpochDay(taskStartDay) else null
+                                val nextDue = RepeatCalculator.nextDate(taskRepeat, dueDate)
+                                if (nextDue != null) {
+                                    val nextStart = startDate?.let {
+                                        nextDue.minusDays(ChronoUnit.DAYS.between(it, dueDate))
+                                    }?.takeIf { it.isBefore(nextDue) }
+                                    api.rescheduleTask(taskId, nextDue, nextStart)
+                                } else {
+                                    api.completeTask(taskId)
+                                }
+                            } else {
+                                api.completeTask(taskId)
+                            }
                         } catch (e: Exception) {
                             Log.e(TAG, "completeTask failed", e)
                             false
                         }
-                        prefs.edit().remove(PREF_PENDING_COMPLETE).apply()
+                        prefs.edit { remove(PREF_PENDING_COMPLETE) }
                         if (!success) {
                             Handler(Looper.getMainLooper()).post {
                                 Toast.makeText(appContext,
