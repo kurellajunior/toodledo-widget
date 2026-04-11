@@ -171,8 +171,8 @@ class TaskListFactory(private val context: Context) : RemoteViewsService.RemoteV
             setOnClickFillInIntent(R.id.priority_frame, Intent().apply {
                 putExtra("task_id", task.id)
                 putExtra("task_repeat", task.repeat)
-                putExtra("task_duedate", task.dueDate.toEpochDay())
-                task.startDate?.let { putExtra("task_startdate", it.toEpochDay()) }
+                putExtra("task_duedate", task.dueDate.toString())
+                task.startDate?.let { putExtra("task_startdate", it.toString()) }
                 putExtra("action", "complete")
             })
             setOnClickFillInIntent(R.id.task_title, Intent().apply {

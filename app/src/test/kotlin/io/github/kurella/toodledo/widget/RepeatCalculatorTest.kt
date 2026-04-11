@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import java.time.LocalDate
 
 /**
- * Tests for RepeatCalculator.nextDate().
+ * Tests for RepeatCalculator.next().
  *
  * Reference: RFC 5545 §3.3.10 (RRULE) and Toodledo API v3 repeat extensions.
  *
@@ -21,8 +21,11 @@ import java.time.LocalDate
  */
 class RepeatCalculatorTest {
 
-    private fun next(repeat: String, due: String, today: String = "2000-01-01"): LocalDate? =
-        RepeatCalculator.nextDate(repeat, LocalDate.parse(due), LocalDate.parse(today))
+    /** Calls next() with no startDate; returns just the computed due date. */
+    private fun nextDue(repeat: String, due: String, today: String = "2000-01-01"): LocalDate? =
+        RepeatCalculator.next(repeat.trim(), null, LocalDate.parse(due), LocalDate.parse(today)).second
+
+    private fun d(s: String) = LocalDate.parse(s)
 
     // ── Simple FREQ + INTERVAL (RFC 5545 §3.3.10) ───────────────────────────
 
@@ -42,7 +45,7 @@ class RepeatCalculatorTest {
         "FREQ=YEARLY;INTERVAL=2,             2026-04-08,  2028-04-08",
     )
     fun simpleInterval(repeat: String, due: String, expected: String) {
-        assertEquals(LocalDate.parse(expected), next(repeat.trim(), due))
+        assertEquals(d(expected), nextDue(repeat, due))
     }
 
     // ── BYMONTHDAY (RFC 5545 §3.3.10) ───────────────────────────────────────
@@ -62,7 +65,7 @@ class RepeatCalculatorTest {
         "FREQ=MONTHLY;BYMONTHDAY=30,  2026-01-30,  2026-03-30",  // Feb has no 30th → skip to Mar
     )
     fun byMonthDay(repeat: String, due: String, expected: String) {
-        assertEquals(LocalDate.parse(expected), next(repeat.trim(), due))
+        assertEquals(d(expected), nextDue(repeat, due))
     }
 
     // ── BYDAY single weekday, FREQ=WEEKLY (RFC 5545 §3.3.10) ────────────────
@@ -79,7 +82,7 @@ class RepeatCalculatorTest {
         "FREQ=WEEKLY;BYDAY=FR,  2026-04-08,  2026-04-10",
     )
     fun bydaySingleWeekday(repeat: String, due: String, expected: String) {
-        assertEquals(LocalDate.parse(expected), next(repeat.trim(), due))
+        assertEquals(d(expected), nextDue(repeat, due))
     }
 
     // ── BYDAY multiple weekdays, FREQ=WEEKLY ────────────────────────────────
@@ -100,7 +103,7 @@ class RepeatCalculatorTest {
         "'FREQ=WEEKLY;BYDAY=SA,SU',            2026-04-11,  2026-04-12",
     )
     fun bydayMultipleWeekdays(repeat: String, due: String, expected: String) {
-        assertEquals(LocalDate.parse(expected), next(repeat.trim(), due))
+        assertEquals(d(expected), nextDue(repeat, due))
     }
 
     // ── BYDAY with ordinal, FREQ=MONTHLY (RFC 5545 §3.3.10) ─────────────────
@@ -117,7 +120,7 @@ class RepeatCalculatorTest {
         "FREQ=MONTHLY;BYDAY=-1MO,  2026-05-25,  2026-06-29",
     )
     fun bydayMonthlyOrdinal(repeat: String, due: String, expected: String) {
-        assertEquals(LocalDate.parse(expected), next(repeat.trim(), due))
+        assertEquals(d(expected), nextDue(repeat, due))
     }
 
     // ── FROMCOMP: base = today, not dueDate ──────────────────────────────────
@@ -136,7 +139,7 @@ class RepeatCalculatorTest {
         "'FREQ=WEEKLY;BYDAY=TU;FROMCOMP',   2026-03-01,  2026-04-10,  2026-04-14",
     )
     fun fromCompletion(repeat: String, due: String, today: String, expected: String) {
-        assertEquals(LocalDate.parse(expected), next(repeat.trim(), due, today))
+        assertEquals(d(expected), nextDue(repeat.trim(), due, today))
     }
 
     // ── Advance to future: result always > today ─────────────────────────────
@@ -157,14 +160,33 @@ class RepeatCalculatorTest {
         "FREQ=WEEKLY;BYDAY=TU,               2026-04-06,  2026-04-10,  2026-04-14",
     )
     fun advancesToFuture(repeat: String, due: String, today: String, expected: String) {
-        assertEquals(LocalDate.parse(expected), next(repeat.trim(), due, today))
+        assertEquals(d(expected), nextDue(repeat.trim(), due, today))
+    }
+
+    // ── startDate propagation and sanity check ───────────────────────────────
+
+    @ParameterizedTest(name = "{0}  start={1}  due={2}  →  ({3}, {4})")
+    @CsvSource(
+        // 3-day lead time preserved: due Apr 8, start Apr 5 → next due Apr 15, next start Apr 12
+        "FREQ=WEEKLY,  2026-04-05,  2026-04-08,  2026-04-12,  2026-04-15",
+        // Same-day start (lead=0): due Apr 8, start Apr 8 → next start Apr 15 (= next due, valid → kept)
+        "FREQ=WEEKLY,  2026-04-08,  2026-04-08,  2026-04-15,   2026-04-15",
+        // start after due (invalid input): start Apr 10, due Apr 8 → next start would be after next due → dropped
+        "FREQ=WEEKLY,  2026-04-10,  2026-04-08,  null,         2026-04-15",
+        // Monthly with lead: due May 8, start May 1 (7-day lead) → next due Jun 8, next start Jun 1
+        "FREQ=MONTHLY, 2026-05-01,  2026-05-08,  2026-06-01,   2026-06-08",
+    )
+    fun startDatePropagation(repeat: String, start: String, due: String, expStart: String, expDue: String) {
+        val startDate = if (start == "null") null else d(start)
+        val expected = (if (expStart == "null") null else d(expStart)) to d(expDue)
+        assertEquals(expected, RepeatCalculator.next(repeat.trim(), startDate, d(due)))
     }
 
     // ── Unhandled / invalid → null ───────────────────────────────────────────
 
-    @ParameterizedTest(name = "''{0}''  →  null")
-    @ValueSource(strings = ["PARENT", "", "  ", "FREQ=BOGUS", "GARBAGE"])
-    fun returnsNull(repeat: String) {
-        assertNull(next(repeat, "2026-04-08"))
+    @ParameterizedTest(name = "''{0}''  →  (null, null)")
+    @ValueSource(strings = ["PARENT", "", "  ", "FREQ=BOGUS", "GARBAGE", "None"])
+    fun returnsNullDue(repeat: String) {
+        assertNull(RepeatCalculator.next(repeat, null, d("2026-04-08")).second)
     }
 }

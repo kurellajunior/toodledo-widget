@@ -2,22 +2,39 @@ package io.github.kurella.toodledo.widget
 
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 /**
- * Calculates the next due date for a Toodledo repeating task.
+ * Calculates the next (startDate, dueDate) for a Toodledo repeating task.
  *
  * Toodledo uses a subset of iCal RRULE (RFC 5545) with two custom extensions:
  *   FROMCOMP – reschedule from completion date instead of due date
  *   PARENT   – subtask inherits repeat from its parent; no local calculation possible
  *
  * Supported RRULE components: FREQ, INTERVAL, BYDAY, BYMONTHDAY.
- *
- * The result always lies strictly after `today` — the rule is applied in a loop
- * until a future date is reached.
  */
 internal object RepeatCalculator {
 
-    fun nextDate(repeat: String, dueDate: LocalDate, today: LocalDate = LocalDate.now()): LocalDate? {
+    /**
+     * calculates nextDue strictly after [today].
+     * if it cannot be calculated the caller should complete the task instead
+     *
+     * @return (nextStart, nextDue) for the next repeat occurrence.
+     *   nextDue is null when [repeat] cannot be resolved (blank, PARENT, unknown FREQ);
+     *   nextStart preserves the original lead time relative to [dueDate];
+     *   it is null when no [startDate] was given, or when the computed value
+     *   would fall after nextDue (invalid lead time is silently dropped).
+     */
+    fun next(repeat: String, startDate: LocalDate?, dueDate: LocalDate, today: LocalDate = LocalDate.now()): Pair<LocalDate?, LocalDate?> {
+        val nextDue = nextDue(repeat, dueDate, today) ?: return null to null
+        val nextStart = startDate
+            ?.let { nextDue.minusDays(ChronoUnit.DAYS.between(it, dueDate)) }
+            ?.takeIf { !it.isAfter(nextDue) }
+        return nextStart to nextDue
+    }
+
+    /** @return next due date strictly after [today], or null for unrecognised/no-op [repeat]. */
+    private fun nextDue(repeat: String, dueDate: LocalDate, today: LocalDate): LocalDate? {
         if (repeat.isBlank() || repeat == "PARENT") return null
 
         val params = repeat.split(";").associateBy(
@@ -29,8 +46,7 @@ internal object RepeatCalculator {
         val interval = params["INTERVAL"]?.toLongOrNull() ?: 1L
         val byDay = params["BYDAY"]
         val byMonthDay = params["BYMONTHDAY"]?.toIntOrNull()
-        val fromComp = "FROMCOMP" in params
-        val base = if (fromComp) today else dueDate
+        val base = if ("FROMCOMP" in params) today else dueDate
 
         var current = base
         do {

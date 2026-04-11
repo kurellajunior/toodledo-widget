@@ -7,15 +7,12 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.Toast
-import io.github.kurella.toodledo.widget.R
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import androidx.core.net.toUri
 import androidx.core.content.edit
 
@@ -164,8 +161,8 @@ class TaskWidgetProvider : AppWidgetProvider() {
             "complete" -> {
                 val taskId = intent.getLongExtra("task_id", -1)
                 val taskRepeat = intent.getStringExtra("task_repeat") ?: ""
-                val taskDueDay = intent.getLongExtra("task_duedate", Long.MIN_VALUE)
-                val taskStartDay = intent.getLongExtra("task_startdate", Long.MIN_VALUE)
+                val dueDate = intent.getStringExtra("task_duedate")?.let { LocalDate.parse(it) }!!
+                val startDate = intent.getStringExtra("task_startdate")?.let { LocalDate.parse(it) }
                 if (taskId != -1L) {
                     val appContext = context.applicationContext
                     val prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -176,20 +173,9 @@ class TaskWidgetProvider : AppWidgetProvider() {
                     Thread {
                         val api = ToodledoApi(TokenStore(appContext))
                         val success = try {
-                            val isRepeating = taskRepeat.isNotEmpty() && taskRepeat != "None" && taskRepeat != "PARENT"
-                            if (isRepeating && taskDueDay != Long.MIN_VALUE) {
-                                val dueDate = LocalDate.ofEpochDay(taskDueDay)
-                                val startDate = if (taskStartDay != Long.MIN_VALUE)
-                                    LocalDate.ofEpochDay(taskStartDay) else null
-                                val nextDue = RepeatCalculator.nextDate(taskRepeat, dueDate)
-                                if (nextDue != null) {
-                                    val nextStart = startDate?.let {
-                                        nextDue.minusDays(ChronoUnit.DAYS.between(it, dueDate))
-                                    }?.takeIf { it.isBefore(nextDue) }
-                                    api.rescheduleTask(taskId, nextDue, nextStart)
-                                } else {
-                                    api.completeTask(taskId)
-                                }
+                            val (nextStart, nextDue) = RepeatCalculator.next(taskRepeat, startDate, dueDate)
+                            if (nextDue != null) {
+                                api.rescheduleTask(taskId, nextStart, nextDue)
                             } else {
                                 api.completeTask(taskId)
                             }

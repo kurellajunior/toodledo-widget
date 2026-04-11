@@ -137,7 +137,7 @@ class ToodledoApi(private val tokenStore: TokenStore) {
         }
     }
 
-    fun rescheduleTask(taskId: Long, newDueDate: LocalDate, newStartDate: LocalDate?): Boolean {
+    fun rescheduleTask(taskId: Long, newStartDate: LocalDate?, newDueDate: LocalDate): Boolean {
         if (!ensureValidToken()) return false
 
         val body = FormBody.Builder()
